@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>歷史情境推演館：元明興替與統治策略</title>
+  <!-- 載入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 載入 Google Fonts：Noto Serif TC 與 Noto Sans TC / Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Noto Serif TC"', 'serif'],
+            sans: ['"Noto Sans TC"', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* ==================== 全域高對比度古卷基底 ==================== */
+    body {
+      background-color: #f4efe6;
+      background-image:
+        radial-gradient(circle at 15% 15%, rgba(255, 253, 249, 0.85) 0%, transparent 50%),
+        repeating-linear-gradient(0deg, rgba(120, 113, 108, 0.04) 0px, rgba(120, 113, 108, 0.04) 1px, transparent 1px, transparent 32px);
+      color: #1c1917;
+      overflow-x: hidden;
+    }
+
+    /* 所有內容卡片統一採用純淨象牙白底與深炭黑文字，確保 12:1 以上超高對比度 */
+    .step-card, .causal-box, .quiz-box, .sidebar-card {
+      background-color: #fffdf9;
+      color: #1c1917;
+      border: 1.5px solid #d6c7b2;
+      box-shadow: 0 8px 24px -6px rgba(28, 25, 23, 0.09);
+    }
+
+    /* ==================== 句中下拉式選單高對比樣式 ==================== */
+    select.inline-dd, select.chain-dd, select.quiz-dd {
+      appearance: none;
+      background-color: #ffffff;
+      color: #111827;
+      border: 2px solid #475569;
+      font-weight: 700;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23111827'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.55rem center;
+      background-size: 0.95rem;
+      padding-right: 2rem;
+      transition: all 0.2s ease;
+    }
+
+    select.inline-dd:focus, select.chain-dd:focus, select.quiz-dd:focus {
+      outline: none;
+      border-color: #1e3a8a;
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.22);
+    }
+
+    /* 卷二（明代）下拉選單聚焦色 */
+    .vol2-theme select.inline-dd:focus,
+    .vol2-theme select.chain-dd:focus,
+    .vol2-theme select.quiz-dd:focus {
+      border-color: #991b1b;
+      box-shadow: 0 0 0 3px rgba(153, 27, 27, 0.22);
+    }
+
+    /* 批改正確：淡綠底配深墨綠字 */
+    select.graded-correct {
+      background-color: #dcfce7 !important;
+      border-color: #15803d !important;
+      color: #14532d !important;
+      font-weight: 700 !important;
+    }
+
+    /* 批改錯誤：淡紅底配深暗紅字 */
+    select.graded-wrong {
+      background-color: #fee2e2 !important;
+      border-color: #b91c1c !important;
+      color: #7f1d1d !important;
+      font-weight: 700 !important;
+    }
+
+    /* 動畫效果 */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-reveal {
+      animation: fadeSlideUp 0.4s ease-out forwards;
+    }
+
+    @keyframes statBounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.07); }
+    }
+    .stat-pulse {
+      animation: statBounce 0.45s ease-in-out;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- ==================== 頂部固定導航列（高對比深墨黑底） ==================== -->
+  <header class="sticky top-0 z-40 w-full bg-[#111827] text-white border-b-2 border-stone-600 shadow-xl">
+    <div class="w-full max-w-[1480px] mx-auto px-3 sm:px-6 py-3 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+
+      <!-- 左側：標題與徽章 -->
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div id="header-emblem" class="w-10 h-10 rounded-xl bg-[#1e3a8a] border border-sky-400/50 flex items-center justify-center shadow shrink-0">
+            <span class="font-serif font-black text-xl text-white">史</span>
+          </div>
+          <div>
+            <h1 class="font-serif font-bold text-base sm:text-xl text-white tracking-wide leading-tight">
+              歷史情境推演館：元明興替與統治策略
+            </h1>
+            <p class="text-xs text-slate-300 hidden sm:block">漸進式因果推演 × 句中下拉互動學習系統</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中央：卷一（元代）與 卷二（明代）高對比切換按鍵 -->
+      <nav aria-label="卷軸切換" class="flex items-center gap-2 bg-slate-800 p-1.5 rounded-xl border border-slate-600 w-full sm:w-auto">
+        <button
+          id="tab-vol1"
+          type="button"
+          onclick="switchVolume(1)"
+          class="flex-1 sm:flex-initial px-4 py-2 rounded-lg font-serif font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-[#1e3a8a] text-white shadow ring-2 ring-sky-300"
+        >
+          <span>📜</span>
+          <span>【卷一】元代的高壓政策</span>
+        </button>
+        <button
+          id="tab-vol2"
+          type="button"
+          onclick="switchVolume(2)"
+          class="flex-1 sm:flex-initial px-4 py-2 rounded-lg font-serif font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 text-slate-200 hover:text-white hover:bg-slate-700"
+        >
+          <span>👑</span>
+          <span>【卷二】明太祖中央集權政策的成因</span>
+        </button>
+      </nav>
+
+      <!-- 右側：教師密碼解鎖控制列與重置進度按鈕 -->
+      <div class="flex flex-wrap items-center justify-between sm:justify-end gap-2">
+        <span
+          id="mode-status-badge"
+          class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-amber-300 border border-amber-400/50"
+        >
+          🔒 學生漸進模式
+        </span>
+
+        <button
+          id="btn-teacher-unlock"
+          type="button"
+          onclick="openTeacherModal()"
+          class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-emerald-700 hover:bg-emerald-600 text-white border border-emerald-400/50 shadow transition flex items-center gap-1.5"
+        >
+          <span>🔓 教師一鍵全解鎖</span>
+        </button>
+
+        <button
+          type="button"
+          onclick="resetAllProgress()"
+          class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 transition flex items-center gap-1"
+        >
+          <span>↺ 重置進度</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 非阻斷式提示訊息橫幅 (Toast) -->
+  <div id="toast-banner" class="hidden fixed top-20 right-4 z-50 max-w-md px-4 py-3 rounded-xl bg-emerald-900 text-white border-2 border-emerald-400 shadow-2xl text-sm font-bold animate-reveal"></div>
+
+  <!-- ==================== 主內容區域 (無邊框全螢幕自適應) ==================== -->
+  <main class="flex-1 w-full max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+    <!-- 左側主學習推演區 (佔 9 欄) -->
+    <div class="lg:col-span-9 space-y-6">
+
+      <!-- =================================================================== -->
+      <!--           【卷一：元代的高壓政策】（草原蒼狼靛藍高對比主題）          -->
+      <!-- =================================================================== -->
+      <section id="volume-1-section" class="space-y-6">
+
+        <!-- 卷一卷首導覽與階段鎖定狀態條 -->
+        <div class="step-card rounded-2xl p-5 sm:p-6 border-t-4 border-t-[#1e3a8a] space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span class="inline-block px-3 py-1 rounded-md text-xs font-bold bg-[#1e3a8a] text-white mb-2">
+                卷一・草原鐵騎入主中原
+              </span>
+              <h2 class="font-serif font-black text-2xl sm:text-3xl text-[#1c1917]">
+                元代的高壓政策：因果推演與統治措施
+              </h2>
+              <p class="text-sm sm:text-base text-[#292524] mt-1">
+                請按順序完成每一步驟的句中下拉選答與因果推理，逐步解鎖後續歷史階段！
+              </p>
+            </div>
+            <div class="shrink-0 bg-blue-50 border border-blue-200 px-4 py-2.5 rounded-xl text-right">
+              <div class="text-xs font-bold text-[#1e3a8a]">本卷推演進度</div>
+              <div id="v1-step-counter" class="font-serif font-black text-xl text-[#1e3a8a]">第 1 / 7 步</div>
+            </div>
+          </div>
+
+          <!-- 階段解鎖路線圖（僅顯示圖示與階段名稱，不劇透內容） -->
+          <div id="v1-roadmap" class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2 border-t border-stone-200 text-xs font-bold"></div>
+        </div>
+
+        <!-- ──────── 第一階：外族入主中原的歷程 ──────── -->
+        <!-- 步驟 1A（初始唯一開放步驟） -->
+        <article id="v1-step-1a" class="step-card rounded-2xl p-5 sm:p-6 space-y-4 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#1e3a8a] text-white font-bold text-xs sm:text-sm">第一階・步驟 1A</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">蒙古部族的統一</h3>
+            </div>
+            <span id="v1-1a-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-[#1e3a8a]">進行中</span>
+          </div>
+
+          <p class="text-sm text-[#292524]">請在下方句中下拉選單選出正確歷史人物與尊號，完成後解鎖下一步：</p>
+
+          <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-300 text-base sm:text-lg leading-loose text-[#1c1917] font-medium">
+            <span class="inline-slot" data-group="v1-1a" data-ans="鐵木真" data-opts="鐵木真,忽必烈,窩闊台,耶律阿保機"></span>
+            統一蒙古部族，被尊為「<span class="inline-slot" data-group="v1-1a" data-ans="成吉思汗" data-opts="成吉思汗,元世祖,天可汗,忽必烈汗"></span>」。
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div id="v1-1a-feedback" class="text-sm font-bold text-[#292524]"></div>
+            <button
+              type="button"
+              onclick="checkStepDropdowns('v1-1a', 'v1-step-1b', 'v1-1a-badge', 'v1-1a-feedback', () => { adjustStat(1, 'control', +5); })"
+              class="px-5 py-2.5 rounded-xl bg-[#1e3a8a] hover:bg-[#1d4ed8] text-white font-bold text-sm shadow transition"
+            >
+              確認答案並解鎖步驟 1B ➔
+            </button>
+          </div>
+        </article>
+
+        <!-- 步驟 1B（完成 1A 後解鎖） -->
+        <article id="v1-step-1b" class="hidden step-card rounded-2xl p-5 sm:p-6 space-y-4 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#1e3a8a] text-white font-bold text-xs sm:text-sm">第一階・步驟 1B</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">滅金亡宋與建立元朝</h3>
+            </div>
+            <span id="v1-1b-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-[#1e3a8a]">進行中</span>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-300 text-base sm:text-lg leading-loose text-[#1c1917] font-medium space-y-2">
+            <p>
+              南宋採取「<span class="inline-slot" data-group="v1-1b" data-ans="聯蒙滅金" data-opts="聯蒙滅金,聯金滅蒙,聯遼抗金,閉關自守"></span>」策略，蒙古協助滅金後，入侵並消滅
+              <span class="inline-slot" data-group="v1-1b" data-ans="南宋" data-opts="南宋,北宋,西夏,大理"></span>。
+            </p>
+            <p>
+              <span class="inline-slot" data-group="v1-1b" data-ans="忽必烈" data-opts="忽必烈,鐵木真,元順帝,伯顏"></span>
+              建立元朝，成為首個
+              <span class="inline-slot" data-group="v1-1b" data-ans="入主中原" data-opts="入主中原,統一西域,開發江南,變法圖強"></span>，並建立統一政權的
+              <span class="inline-slot" data-group="v1-1b" data-ans="外族" data-opts="外族,漢族,鮮卑族,契丹族"></span>。
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div id="v1-1b-feedback" class="text-sm font-bold text-[#292524]"></div>
+            <button
+              type="button"
+              onclick="checkStepDropdowns('v1-1b', 'v1-step-2a', 'v1-1b-badge', 'v1-1b-feedback', () => { adjustStat(1, 'control', +10); })"
+              class="px-5 py-2.5 rounded-xl bg-[#1e3a8a] hover:bg-[#1d4ed8] text-white font-bold text-sm shadow transition"
+            >
+              確認答案並進入第二階因果推論 ➔
+            </button>
+          </div>
+        </article>
+
+        <!-- ──────── 第二階：多問多答因果推論——統治危機與政策抉擇 ──────── -->
+        <!-- 步驟 2A：第一問（識別統治危機） -->
+        <article id="v1-step-2a" class="hidden step-card rounded-2xl p-5 sm:p-6 space-y-5 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#1e3a8a] text-white font-bold text-xs sm:text-sm">第二階・步驟 2A（第一問）</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">分析客觀現狀，推論統治危機</h3>
+            </div>
+            <span id="v1-2a-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-[#1e3a8a]">因果推理一</span>
+          </div>
+
+          <!-- 沉浸式情境對話（深海藍黑底 #0f172a 配純白字 #f8fafc 與天藍角色名 #38bdf8） -->
+          <div class="rounded-2xl p-5 bg-[#0f172a] text-[#f8fafc] border-2 border-[#1d4ed8] space-y-3">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">👑</span>
+              <span class="font-serif font-bold text-base sm:text-lg text-[#38bdf8]">【元世祖・忽必烈】大都御前議政：</span>
+            </div>
+            <p class="text-sm sm:text-base leading-relaxed text-[#f8fafc]">
+              「朕雖滅南宋、一統天下，但擺在眼前有四大客觀現狀，令朕日夜憂心……」
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-sm">
+              <div class="p-3 rounded-xl bg-slate-800 border border-slate-600 text-white">
+                <span class="font-bold text-[#38bdf8]">線索 1：</span>蒙古族為<strong>少數民族</strong>，人數較少。
+              </div>
+              <div class="p-3 rounded-xl bg-slate-800 border border-slate-600 text-white">
+                <span class="font-bold text-[#38bdf8]">線索 2：</span>蒙古族與漢族存在極大<strong>文化差異</strong>。
+              </div>
+              <div class="p-3 rounded-xl bg-slate-800 border border-slate-600 text-white">
+                <span class="font-bold text-[#38bdf8]">線索 3：</span>蒙古軍隊武功強盛，但<strong>文化低下</strong>。
+              </div>
+              <div class="p-3 rounded-xl bg-slate-800 border border-slate-600 text-white">
+                <span class="font-bold text-[#38bdf8]">線索 4：</span><strong>管治領土</strong>極為遼闊。
+              </div>
+            </div>
+          </div>
+
+          <!-- 第一問：面對以上差異與現狀，有何問題？ -->
+          <div class="space-y-3">
+            <h4 class="font-serif font-bold text-base sm:text-lg text-[#1e3a8a]">
+              ❓ 第一問：面對以上「人數少、文化差異大、領土遼闊」等現狀，元朝統治者面臨什麼最迫切的危機問題？
+            </h4>
+            <div class="grid grid-cols-1 gap-3">
+              <button
+                type="button"
+                onclick="handleV1Step2A('A')"
+                class="text-left p-4 rounded-xl bg-white hover:bg-blue-50 border-2 border-stone-300 hover:border-[#1e3a8a] transition flex items-start gap-3"
+              >
+                <span class="w-7 h-7 rounded-full bg-[#1e3a8a] text-white font-bold text-sm flex items-center justify-center shrink-0">A</span>
+                <span class="text-sm sm:text-base font-bold text-[#1c1917]">國庫稅收嚴重不足，無法維持大都宮廷日常開支。</span>
+              </button>
+
+              <button
+                type="button"
+                onclick="handleV1Step2A('B')"
+                class="text-left p-4 rounded-xl bg-white hover:bg-blue-50 border-2 border-stone-300 hover:border-[#1e3a8a] transition flex items-start gap-3"
+              >
+                <span class="w-7 h-7 rounded-full bg-[#1e3a8a] text-white font-bold text-sm flex items-center justify-center shrink-0">B</span>
+                <span class="text-sm sm:text-base font-bold text-[#1c1917]">邊疆遊牧部族頻繁南侵，威脅蒙古本部的安全。</span>
+              </button>
+
+              <button
+                type="button"
+                onclick="handleV1Step2A('C')"
+                class="text-left p-4 rounded-xl bg-white hover:bg-blue-50 border-2 border-stone-300 hover:border-[#1e3a8a] transition flex items-start gap-3"
+              >
+                <span class="w-7 h-7 rounded-full bg-[#1e3a8a] text-white font-bold text-sm flex items-center justify-center shrink-0">C</span>
+                <span class="text-sm sm:text-base font-bold text-[#1c1917]">各地漢人反抗不斷，隨時動搖蒙古少數民族的統治政權。</span>
+              </button>
+            </div>
+            <div id="v1-2a-feedback" class="hidden p-3.5 rounded-xl text-sm font-bold"></div>
+          </div>
+        </article>
+
+        <!-- 步驟 2B：第二問（制定應對政策，完成 2A 後解鎖） -->
+        <article id="v1-step-2b" class="hidden step-card rounded-2xl p-5 sm:p-6 space-y-4 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#1e3a8a] text-white font-bold text-xs sm:text-sm">第二階・步驟 2B（第二問）</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">因果追問：元廷應如何處理漢人反抗？</h3>
+            </div>
+            <span id="v1-2b-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-[#1e3a8a]">因果推理二</span>
+          </div>
+
+          <div class="p-4 rounded-xl bg-blue-50 border-l-4 border-[#1e3a8a] text-sm sm:text-base text-[#1c1917] font-medium">
+            <strong>因果承接：</strong>既然「各地漢人反抗不斷」，而蒙古族人數又遠少於漢人，忽必烈與元廷會選擇什麼治國方針來鞏固統治？
+          </div>
+
+          <div class="grid grid-cols-1 gap-3">
+            <button
+              type="button"
+              onclick="handleV1Step2B('A')"
+              class="text-left p-4 rounded-xl bg-white hover:bg-blue-50 border-2 border-stone-300 hover:border-[#1e3a8a] transition flex items-start gap-3"
+            >
+              <span class="w-7 h-7 rounded-full bg-[#1e3a8a] text-white font-bold text-sm flex items-center justify-center shrink-0">A</span>
+              <span class="text-sm sm:text-base font-bold text-[#1c1917]">全面推行漢化與科舉，將中央軍政大權交由漢族士大夫主導。</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="handleV1Step2B('B')"
+              class="text-left p-4 rounded-xl bg-white hover:bg-blue-50 border-2 border-stone-300 hover:border-[#1e3a8a] transition flex items-start gap-3"
+            >
+              <span class="w-7 h-7 rounded-full bg-[#1e3a8a] text-white font-bold text-sm flex items-center justify-center shrink-0">B</span>
+              <span class="text-sm sm:text-base font-bold text-[#1c1917]">實行「高壓統治政策」，透過民族分化不公平對待與嚴密禁令壓制漢人反抗。</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="handleV1Step2B('C')"
+              class="text-left p-4 rounded-xl bg-white hover:bg-blue-50 border-2 border-stone-300 hover:border-[#1e3a8a] transition flex items-start gap-3"
+            >
+              <span class="w-7 h-7 rounded-full bg-[#1e3a8a] text-white font-bold text-sm flex items-center justify-center shrink-0">C</span>
+              <span class="text-sm sm:text-base font-bold text-[#1c1917]">放權予漢人地方官員高度自治，朝廷僅象徵性收取歲貢。</span>
+            </button>
+          </div>
+          <div id="v1-2b-feedback" class="hidden p-3.5 rounded-xl text-sm font-bold"></div>
+        </article>
+
+        <!-- ──────── 第三階：高壓政策兩大支柱——四等人制對比與活動限制 ──────── -->
+        <!-- 步驟 3A：四等人制對比與句中下拉 -->
+        <article id="v1-step-3a" class="hidden step-card rounded-2xl p-5 sm:p-6 space-y-5 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#1e3a8a] text-white font-bold text-xs sm:text-sm">第三階・步驟 3A</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">支柱一：四等人制對比（「蒙古人、色目人」vs「漢人、南人」）</h3>
+            </div>
+            <span id="v1-3a-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-[#1e3a8a]">進行中</span>
+          </div>
+
+          <!-- 互動生活對比卡片 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-xl bg-blue-50 border-2 border-[#1e3a8a] space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-1 rounded bg-[#1e3a8a] text-white text-xs font-bold">第一、二等：蒙古人、色目人</span>
+                <span class="text-xs font-bold text-[#1e3a8a]">統治特權階層</span>
+              </div>
+              <ul class="list-disc list-inside text-sm text-[#1c1917] space-y-1.5 leading-relaxed">
+                <li><strong>任官：</strong>高居統治階層，包攬中央與地方高級要職。</li>
+                <li><strong>考試：</strong>科舉試卷較易，錄取比例極高。</li>
+                <li><strong>法律：</strong>蒙古人殺死南人、漢人只是<strong>罰錢了事</strong>（燒埋銀），無需償命。</li>
+              </ul>
+            </div>
+
+            <div class="p-4 rounded-xl bg-red-50 border-2 border-[#991b1b] space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-1 rounded bg-[#991b1b] text-white text-xs font-bold">第三、四等：漢人、南人</span>
+                <span class="text-xs font-bold text-[#991b1b]">受壓迫被統治階層</span>
+              </div>
+              <ul class="list-disc list-inside text-sm text-[#1c1917] space-y-1.5 leading-relaxed">
+                <li><strong>任官：</strong>出仕人數較少，而且只能出任<strong>低級官員</strong>。</li>
+                <li><strong>考試：</strong>科舉<strong>試卷較難</strong>，名額受嚴格限制。</li>
+                <li><strong>法律：</strong>殺死蒙古人則需<strong>抵命</strong>，或被<strong>滅族</strong>！</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 句中下拉選答 -->
+          <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-300 text-base sm:text-lg leading-loose text-[#1c1917] font-medium space-y-2">
+            <p>
+              元廷實行<strong>不公平</strong>的對待，將人民分為
+              <span class="inline-slot" data-group="v1-3a" data-ans="蒙古人" data-opts="蒙古人,契丹人,女真人,鮮卑人"></span>、
+              <span class="inline-slot" data-group="v1-3a" data-ans="色目人" data-opts="色目人,黨項人,高麗人,吐蕃人"></span>、
+              <span class="inline-slot" data-group="v1-3a" data-ans="漢人" data-opts="漢人,苗人,越人,夷人"></span>，和
+              <span class="inline-slot" data-group="v1-3a" data-ans="南人" data-opts="南人,北人,山人,閩人"></span> 四等；在任官、法律、考試上均不公平：
+            </p>
+            <p>
+              漢人南人考試「<span class="inline-slot" data-group="v1-3a" data-ans="試卷較難" data-opts="試卷較難,試卷較易,免試錄取,考題相同"></span>」，出仕人數較少且只能出任「<span class="inline-slot" data-group="v1-3a" data-ans="低級官員" data-opts="低級官員,宰相重臣,地方將領,監察御史"></span>」；法律上，蒙古人殺死南人漢人只是「<span class="inline-slot" data-group="v1-3a" data-ans="罰錢了事" data-opts="罰錢了事,斬首示眾,流放邊疆,削爵為民"></span>」，相反則需「<span class="inline-slot" data-group="v1-3a" data-ans="抵命" data-opts="抵命,罰款,勞役,赦免"></span>」，或被「<span class="inline-slot" data-group="v1-3a" data-ans="滅族" data-opts="滅族,貶官,充軍,罰銀"></span>」。
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div id="v1-3a-feedback" class="text-sm font-bold text-[#292524]"></div>
+            <button
+              type="button"
+              onclick="checkStepDropdowns('v1-3a', 'v1-step-3b', 'v1-3a-badge', 'v1-3a-feedback', () => { adjustStat(1, 'resentment', +15); adjustStat(1, 'integration', -10); })"
+              class="px-5 py-2.5 rounded-xl bg-[#1e3a8a] hover:bg-[#1d4ed8] text-white font-bold text-sm shadow transition"
+            >
+              確認答案並解鎖步驟 3B ➔
+            </button>
+          </div>
+        </article>
+
+        <!-- 步驟 3B：對漢人活動施以各種限制 -->
+        <article id="v1-step-3b" class="hidden step-card rounded-2xl p-5 sm:p-6 space-y-4 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#1e3a8a] text-white font-bold text-xs sm:text-sm">第三階・步驟 3B</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">支柱二：對漢人活動施以各種限制</h3>
+            </div>
+            <span id="v1-3b-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-[#1e3a8a]">進行中</span>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-300 text-base sm:text-lg leading-loose text-[#1c1917] font-medium space-y-2">
+            <p>為防範漢人集結反抗，元廷對漢人日常活動施以三項嚴厲限制：</p>
+            <ul class="list-disc list-inside space-y-2 pl-2">
+              <li>禁止漢人「<span class="inline-slot" data-group="v1-3b" data-ans="私藏及打造武器" data-opts="私藏及打造武器,耕種農田,經商貿易,讀書寫字"></span>」</li>
+              <li>禁止漢人「<span class="inline-slot" data-group="v1-3b" data-ans="習武及打獵" data-opts="習武及打獵,祭祀祖先,穿著漢服,乘坐馬車"></span>」</li>
+              <li>禁止漢人「<span class="inline-slot" data-group="v1-3b" data-ans="集會及夜行" data-opts="集會及夜行,白天外出,跨縣通婚,釀酒製茶"></span>」</li>
+            </ul>
+            <p class="pt-1 font-bold text-[#1e3a8a]">
+              ➔ 施行上述所有禁令的直接目的：防止漢人「<span class="inline-slot" data-group="v1-3b" data-ans="作亂" data-opts="作亂,致富,逃稅,南遷"></span>」。
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div id="v1-3b-feedback" class="text-sm font-bold text-[#292524]"></div>
+            <button
+              type="button"
+              onclick="checkStepDropdowns('v1-3b', 'v1-step-4', 'v1-3b-badge', 'v1-3b-feedback', () => { adjustStat(1, 'control', +10); adjustStat(1, 'resentment', +15); })"
+              class="px-5 py-2.5 rounded-xl bg-[#1e3a8a] hover:bg-[#1d4ed8] text-white font-bold text-sm shadow transition"
+            >
+              確認答案並進入第四階月餅起義 RPG ➔
+            </button>
+          </div>
+        </article>
+
+        <!-- ──────── 第四階：元亡與中秋月餅起義（文字冒險 RPG + 因果鍊） ──────── -->
+        <article id="v1-step-4" class="hidden step-card rounded-2xl p-5 sm:p-6 space-y-6 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#1e3a8a] text-white font-bold text-xs sm:text-sm">第四階・情境 RPG 與因果鍊</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">元亡與「中秋月餅起義」的故事</h3>
+            </div>
+            <span id="v1-4-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-[#1e3a8a]">進行中</span>
+          </div>
+
+          <!-- RPG 框（深海藍黑底 #0f172a 配純白字 #f8fafc） -->
+          <div class="rounded-2xl p-5 bg-[#0f172a] text-[#f8fafc] border-2 border-[#1d4ed8] space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <span class="font-serif font-bold text-base sm:text-lg text-[#38bdf8]">🥮 第一人稱情境：元末起義軍秘密聯絡人</span>
+              <span class="px-2.5 py-0.5 rounded bg-blue-900 text-sky-200 text-xs font-bold border border-sky-400/40">城門宵禁與武器嚴查</span>
+            </div>
+            <p class="text-sm sm:text-base leading-relaxed text-[#f8fafc]">
+              元末政治腐敗、民不聊生，長年<strong>高壓統治</strong>積壓了深重的民族怨恨。你奉命在八月十五中秋前夕，將寫有「<strong>八月十五殺韃子（八月十五夜起義）</strong>」的起義密信傳遍城內外百姓家中。然而城門元兵正嚴格執行「<strong>禁止集會及夜行</strong>」與「<strong>禁止私藏武器</strong>」，對行人逐一搜身！你該如何傳遞密信？
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <button
+                type="button"
+                onclick="handleV1Rpg('A')"
+                class="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-500 text-left transition space-y-1"
+              >
+                <div class="font-bold text-[#38bdf8] text-sm">選擇 A：竹杖藏信闖城門</div>
+                <p class="text-xs sm:text-sm text-slate-200">將布條塞入空心木棍中扮作行商闖關。</p>
+              </button>
+
+              <button
+                type="button"
+                onclick="handleV1Rpg('B')"
+                class="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-500 text-left transition space-y-1"
+              >
+                <div class="font-bold text-[#38bdf8] text-sm">選擇 B：深夜鳴鑼召集百姓</div>
+                <p class="text-xs sm:text-sm text-slate-200">半夜敲響銅鑼召集村民到祠堂公開宣讀起義號令。</p>
+              </button>
+
+              <button
+                type="button"
+                onclick="handleV1Rpg('C')"
+                class="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 border-2 border-[#38bdf8] text-left transition space-y-1"
+              >
+                <div class="font-bold text-[#38bdf8] text-sm">選擇 C：中秋互贈月餅傳書</div>
+                <p class="text-xs sm:text-sm text-slate-200">趁中秋節互贈食物習俗，將起義紙條藏入「月餅」餡料中分發。</p>
+              </button>
+            </div>
+
+            <div id="v1-rpg-success" class="hidden p-4 rounded-xl bg-blue-950 border border-sky-400 text-sm sm:text-base text-white leading-relaxed animate-reveal">
+              🎉 <strong>起義成功、元朝覆亡！</strong>元兵見你籃中只是尋常中秋節慶餅食，不以為意便放行。八月十五夜，百姓切開月餅發現起義密信，群起響應推翻元朝統治，元順帝北逃，元朝滅亡！這也成為中秋節吃月餅習俗的著名歷史傳說。
+            </div>
+          </div>
+
+          <!-- 視覺化因果鍊鎖定 -->
+          <div class="causal-box rounded-2xl p-5 bg-slate-50 border border-stone-300 space-y-4">
+            <h4 class="font-serif font-bold text-base sm:text-lg text-[#1e3a8a]">
+              ⛓️ 視覺化因果鍊：完成元朝覆亡因果配對以解鎖第五階筆記小測
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div class="p-3.5 rounded-xl bg-white border border-stone-300">
+                <span class="text-xs font-bold text-[#1e3a8a] block mb-1">① 起因（統治政策）</span>
+                <select id="v1-c1" class="chain-dd w-full p-2.5 rounded-lg text-xs sm:text-sm">
+                  <option value="">-- 請選擇起因 --</option>
+                  <option value="correct">高壓統治與四等人歧視</option>
+                  <option value="wrong1">全面推行漢化與輕徭薄賦</option>
+                  <option value="wrong2">重用漢族文官治理地方</option>
+                </select>
+              </div>
+              <div class="p-3.5 rounded-xl bg-white border border-stone-300">
+                <span class="text-xs font-bold text-[#1e3a8a] block mb-1">② 過程（秘密串聯）</span>
+                <select id="v1-c2" class="chain-dd w-full p-2.5 rounded-lg text-xs sm:text-sm">
+                  <option value="">-- 請選擇過程 --</option>
+                  <option value="wrong1">漢人獲准公開集會習武練兵</option>
+                  <option value="correct">漢人怨恨積壓並借月餅暗通消息</option>
+                  <option value="wrong2">元廷主動廢除四等人制並退位</option>
+                </select>
+              </div>
+              <div class="p-3.5 rounded-xl bg-white border border-stone-300">
+                <span class="text-xs font-bold text-[#1e3a8a] block mb-1">③ 結果（政權更替）</span>
+                <select id="v1-c3" class="chain-dd w-full p-2.5 rounded-lg text-xs sm:text-sm">
+                  <option value="">-- 請選擇結果 --</option>
+                  <option value="wrong1">元朝統治愈加穩固延續百年</option>
+                  <option value="wrong2">南宋皇室重新復辟統治中原</option>
+                  <option value="correct">各地民變爆發推翻元朝</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div id="v1-chain-fb" class="text-sm font-bold text-[#292524]"></div>
+              <button
+                type="button"
+                onclick="verifyV1Chain()"
+                class="px-5 py-2.5 rounded-xl bg-[#1e3a8a] hover:bg-[#1d4ed8] text-white font-bold text-sm shadow transition"
+              >
+                鎖定因果鍊並解鎖第五階總結小測 ➔
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- ──────── 第五階：卷一課題筆記下拉式填充總結小測（28 格） ──────── -->
+        <article id="v1-step-5" class="hidden quiz-box rounded-2xl p-5 sm:p-6 border-2 border-[#1e3a8a] space-y-5 animate-reveal">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-4">
+            <div>
+              <span class="px-3 py-1 rounded-lg bg-[#1e3a8a] text-white font-bold text-xs sm:text-sm">第五階・總結驗收</span>
+              <h3 class="font-serif font-bold text-xl sm:text-2xl text-[#1c1917] mt-1.5">
+                卷一課題筆記下拉式填充小測（共 28 格）
+              </h3>
+              <p class="text-xs sm:text-sm text-[#292524]">請完成所有句中下拉選單，提交後系統將即時批改並在錯題旁以紅字顯示正確答案：</p>
+            </div>
+            <div id="v1-quiz-score" class="hidden px-4 py-2 rounded-xl bg-[#1e3a8a] text-white font-bold text-sm shadow">
+              得分：0 / 28
+            </div>
+          </div>
+
+          <div class="space-y-3.5 text-sm sm:text-base leading-loose text-[#1c1917]">
+            <div class="p-4 rounded-xl bg-slate-50 border border-stone-300">
+              <strong class="text-[#1e3a8a]">1.</strong>
+              <span class="quiz-slot" data-vol="1" data-ans="鐵木真" data-opts="鐵木真,忽必烈,窩闊台,拖雷"></span>
+              統一蒙古部族，被尊為「<span class="quiz-slot" data-vol="1" data-ans="成吉思汗" data-opts="成吉思汗,元世祖,忽必烈汗,察合台汗"></span>」。
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 border border-stone-300">
+              <strong class="text-[#1e3a8a]">2.</strong>
+              南宋「<span class="quiz-slot" data-vol="1" data-ans="聯蒙滅金" data-opts="聯蒙滅金,聯金滅蒙,聯遼滅金,閉關自守"></span>」，蒙古協助滅金後，入侵並消滅
+              <span class="quiz-slot" data-vol="1" data-ans="南宋" data-opts="南宋,北宋,西夏,大理"></span>。
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 border border-stone-300">
+              <strong class="text-[#1e3a8a]">3.</strong>
+              <span class="quiz-slot" data-vol="1" data-ans="忽必烈" data-opts="忽必烈,鐵木真,元順帝,伯顏"></span>
+              建立元朝，成為首個
+              <span class="quiz-slot" data-vol="1" data-ans="入主中原" data-opts="入主中原,統一西域,開發江南,變法圖強"></span>，並建立統一政權的
+              <span class="quiz-slot" data-vol="1" data-ans="外族" data-opts="外族,漢族,鮮卑族,契丹族"></span>。
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 border border-stone-300">
+              <strong class="text-[#1e3a8a]">4.</strong>
+              危機：為
+              <span class="quiz-slot" data-vol="1" data-ans="少數民族" data-opts="少數民族,農耕民族,海洋民族,工商民族"></span>，人數較少；蒙古族與漢族存在極大
+              <span class="quiz-slot" data-vol="1" data-ans="文化差異" data-opts="文化差異,語言相通,信仰一致,經濟互補"></span>；武功強盛，但
+              <span class="quiz-slot" data-vol="1" data-ans="文化低下" data-opts="文化低下,兵力薄弱,疆域狹小,缺乏騎兵"></span>；
+              <span class="quiz-slot" data-vol="1" data-ans="管治領土" data-opts="管治領土,塞外草原,江南水鄉,西域商道"></span> 遼闊，各地漢人
+              <span class="quiz-slot" data-vol="1" data-ans="反抗" data-opts="反抗,歸順,遷徙,納貢"></span> 不斷。
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 border border-stone-300">
+              <strong class="text-[#1e3a8a]">5.</strong>
+              實行
+              <span class="quiz-slot" data-vol="1" data-ans="高壓統治政策" data-opts="高壓統治政策,懷柔安撫政策,漢化改制政策,無為而治政策"></span>
+              ➔
+              <span class="quiz-slot" data-vol="1" data-ans="不公平" data-opts="不公平,平等寬容,尊儒重道,論功行賞"></span>
+              的對待：將人民分為
+              <span class="quiz-slot" data-vol="1" data-ans="蒙古" data-opts="蒙古,契丹,女真,鮮卑"></span> 人、
+              <span class="quiz-slot" data-vol="1" data-ans="色目人" data-opts="色目人,黨項人,吐蕃人,高麗人"></span>、
+              <span class="quiz-slot" data-vol="1" data-ans="漢人" data-opts="漢人,苗人,夷人,越人"></span>，和
+              <span class="quiz-slot" data-vol="1" data-ans="南人" data-opts="南人,北人,山人,閩人"></span> 四等。
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 border border-stone-300">
+              <strong class="text-[#1e3a8a]">6.</strong>
+              漢人南人考試的
+              <span class="quiz-slot" data-vol="1" data-ans="試卷較難" data-opts="試卷較難,試卷較易,免試錄取,考題相同"></span>，出仕人數較少，而且只能出任
+              <span class="quiz-slot" data-vol="1" data-ans="低級官員" data-opts="低級官員,宰相重臣,地方將領,監察御史"></span>。
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 border border-stone-300">
+              <strong class="text-[#1e3a8a]">7.</strong>
+              法律上，蒙古人殺死南人漢人只是
+              <span class="quiz-slot" data-vol="1" data-ans="罰錢了事" data-opts="罰錢了事,斬首示眾,流放邊疆,削爵為民"></span>；相反，則需
+              <span class="quiz-slot" data-vol="1" data-ans="抵命" data-opts="抵命,罰款,勞役,赦免"></span>，或被
+              <span class="quiz-slot" data-vol="1" data-ans="滅族" data-opts="滅族,貶官,充軍,罰銀"></span>。
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 border border-stone-300">
+              <strong class="text-[#1e3a8a]">8.</strong>
+              對漢人活動施以各種
+              <span class="quiz-slot" data-vol="1" data-ans="限制" data-opts="限制,獎賞,資助,放任"></span>：禁止漢人
+              <span class="quiz-slot" data-vol="1" data-ans="私藏及打造武器" data-opts="私藏及打造武器,耕種農田,經商貿易,讀書寫字"></span>、禁止漢人
+              <span class="quiz-slot" data-vol="1" data-ans="習武及打獵" data-opts="習武及打獵,祭祀祖先,穿著漢服,乘坐馬車"></span>、禁止漢人
+              <span class="quiz-slot" data-vol="1" data-ans="集會及夜行" data-opts="集會及夜行,白天外出,跨縣通婚,釀酒製茶"></span> ➔ 防止漢人
+              <span class="quiz-slot" data-vol="1" data-ans="作亂" data-opts="作亂,致富,逃稅,南遷"></span>。
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <button
+              type="button"
+              onclick="gradeSummaryQuiz(1)"
+              class="px-6 py-3 rounded-xl bg-[#1e3a8a] hover:bg-[#1d4ed8] text-white font-serif font-bold text-base shadow-md transition"
+            >
+              📜 提交卷一小測並批改
+            </button>
+            <button
+              type="button"
+              onclick="resetSummaryQuiz(1)"
+              class="px-4 py-2.5 rounded-xl bg-stone-200 hover:bg-stone-300 text-[#1c1917] font-bold text-sm transition"
+            >
+              重設卷一選項
+            </button>
+          </div>
+
+          <!-- 卷一結算稱號卡 -->
+          <div id="v1-result-banner" class="hidden p-5 rounded-2xl bg-[#0f172a] text-white border-2 border-[#38bdf8] flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-reveal">
+            <div>
+              <span class="text-xs font-bold text-[#38bdf8] uppercase">卷一結算稱號</span>
+              <h4 id="v1-rank-title" class="font-serif font-bold text-xl text-white mt-0.5"></h4>
+              <p id="v1-rank-desc" class="text-sm text-slate-200 mt-1"></p>
+            </div>
+            <button
+              type="button"
+              onclick="switchVolume(2)"
+              class="px-5 py-3 rounded-xl bg-[#991b1b] hover:bg-[#b91c1c] text-white font-serif font-bold text-sm shadow transition shrink-0"
+            >
+              前往【卷二】明太祖中央集權政策 ➔
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <!-- =================================================================== -->
+      <!--   【卷二：明太祖中央集權政策的成因】（宮廷朱砂紅與深棕金高對比主題）   -->
+      <!-- =================================================================== -->
+      <section id="volume-2-section" class="hidden vol2-theme space-y-6">
+
+        <!-- 卷二卷首導覽與階段鎖定狀態條（象牙白底 #fffdf9 + 深炭黑字 #1c1917 + 深朱紅 #991b1b） -->
+        <div class="step-card rounded-2xl p-5 sm:p-6 border-t-4 border-t-[#991b1b] space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span class="inline-block px-3 py-1 rounded-md text-xs font-bold bg-[#991b1b] text-white mb-2">
+                卷二・布衣天子的雙面性格與集權之路
+              </span>
+              <h2 class="font-serif font-black text-2xl sm:text-3xl text-[#1c1917]">
+                明太祖推行君主集權政策的成因
+              </h2>
+              <p class="text-sm sm:text-base text-[#292524] mt-1">
+                第一身代入開國皇帝朱元璋（「朕」），透過多問多答剖析身世背景如何塑造「愛民休養」與「猜忌集權」兩條路線。
+              </p>
+            </div>
+            <div class="shrink-0 bg-[#fef2f2] border border-[#991b1b]/40 px-4 py-2.5 rounded-xl text-right">
+              <div class="text-xs font-bold text-[#991b1b]">本卷推演進度</div>
+              <div id="v2-step-counter" class="font-serif font-black text-xl text-[#991b1b]">第 1 / 8 步</div>
+            </div>
+          </div>
+
+          <!-- 階段解鎖路線圖 -->
+          <div id="v2-roadmap" class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2 border-t border-stone-200 text-xs font-bold"></div>
+        </div>
+
+        <!-- ──────── 第一階：推翻元朝與開國背景（步驟 1A，初始唯一開放步驟） ──────── -->
+        <article id="v2-step-1a" class="step-card rounded-2xl p-5 sm:p-6 space-y-4 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#991b1b] text-white font-bold text-xs sm:text-sm">第一階・步驟 1A</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">第一人稱代入：推翻元朝與建立明朝</h3>
+            </div>
+            <span id="v2-1a-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#fef2f2] text-[#991b1b] border border-[#991b1b]/30">進行中</span>
+          </div>
+
+          <!-- 深紫檀暗紅黑底 (#1f0d0d) 配純白高對比內文 (#ffffff) 與亮琥珀角色名 (#fbbf24) -->
+          <div class="rounded-2xl p-5 bg-[#1f0d0d] text-[#ffffff] border-2 border-[#991b1b] space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">🐉</span>
+              <span class="font-serif font-bold text-base sm:text-lg text-[#fbbf24]">【明太祖・朱元璋】南京奉天殿自述：</span>
+            </div>
+            <p class="text-sm sm:text-base leading-relaxed text-[#f5f5f4]">
+              「回想當年天下大亂，朕從一介布衣起兵，歷經千辛萬苦終於一統江山、登基稱帝。請先替朕理清大明開國的歷史來龍去脈！」
+            </p>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-xl bg-[#fffbeb] border border-[#78350f]/30 text-base sm:text-lg leading-loose text-[#1c1917] font-medium">
+            元代實行
+            <span class="inline-slot" data-group="v2-1a" data-ans="高壓" data-opts="高壓,懷柔,漢化,寬鬆"></span>
+            統治，激發人民
+            <span class="inline-slot" data-group="v2-1a" data-ans="反抗" data-opts="反抗,順從,遷徙,歸附"></span>，元末群雄起事，
+            <span class="inline-slot" data-group="v2-1a" data-ans="朱元璋" data-opts="朱元璋,劉伯溫,徐達,陳友諒"></span>
+            推翻元朝，改國號明，是為
+            <span class="inline-slot" data-group="v2-1a" data-ans="明太祖" data-opts="明太祖,明成祖,明仁宗,明英宗"></span>。
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div id="v2-1a-feedback" class="text-sm font-bold text-[#292524]"></div>
+            <button
+              type="button"
+              onclick="checkStepDropdowns('v2-1a', 'v2-step-2a', 'v2-1a-badge', 'v2-1a-feedback', () => { adjustStat(2, 'authority', +10); })"
+              class="px-5 py-2.5 rounded-xl bg-[#991b1b] hover:bg-[#b91c1c] text-white font-bold text-sm shadow transition"
+            >
+              確認答案並進入第二階（平民出身線）➔
+            </button>
+          </div>
+        </article>
+
+        <!-- ──────── 第二階：多問多答推論（分支一：平民出身 ➔ 愛民施政路線） ──────── -->
+        <!-- 步驟 2A（第一問） -->
+        <article id="v2-step-2a" class="hidden step-card rounded-2xl p-5 sm:p-6 space-y-4 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#991b1b] text-white font-bold text-xs sm:text-sm">第二階・步驟 2A（第一問）</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">身世分支一：平民出身的正面影響</h3>
+            </div>
+            <span id="v2-2a-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#fef2f2] text-[#991b1b]">因果推理一</span>
+          </div>
+
+          <div class="p-4 rounded-xl bg-[#fffbeb] border-l-4 border-[#78350f] text-base sm:text-lg text-[#1c1917] font-medium">
+            「朕本是 <span class="inline-slot" data-group="v2-2a-dd" data-ans="平民" data-opts="平民,貴族,皇室,世家"></span> 出身，幼年家貧，並非世家大族。」
+          </div>
+
+          <div class="space-y-3">
+            <h4 class="font-serif font-bold text-base sm:text-lg text-[#78350f]">
+              ❓ 追問一：請先選出上方空格的出身身份，再回答——這段平民經歷讓朕比歷代帝王更能了解什麼？
+            </h4>
+            <div class="grid grid-cols-1 gap-3">
+              <button
+                type="button"
+                onclick="handleV2Step2A('A')"
+                class="text-left p-4 rounded-xl bg-white hover:bg-[#fef2f2] border-2 border-stone-300 hover:border-[#991b1b] transition flex items-start gap-3"
+              >
+                <span class="w-7 h-7 rounded-full bg-[#78350f] text-white font-bold text-sm flex items-center justify-center shrink-0">A</span>
+                <span class="text-sm sm:text-base font-bold text-[#1c1917]">塞外草原游牧部族的騎射習慣與部落聯盟規則。</span>
+              </button>
+
+              <button
+                type="button"
+                onclick="handleV2Step2A('B')"
+                class="text-left p-4 rounded-xl bg-white hover:bg-[#fef2f2] border-2 border-stone-300 hover:border-[#991b1b] transition flex items-start gap-3"
+              >
+                <span class="w-7 h-7 rounded-full bg-[#78350f] text-white font-bold text-sm flex items-center justify-center shrink-0">B</span>
+                <span class="text-sm sm:text-base font-bold text-[#1c1917]">民間疾苦與底層百姓在戰亂重稅下的艱難處境。</span>
+              </button>
+
+              <button
+                type="button"
+                onclick="handleV2Step2A('C')"
+                class="text-left p-4 rounded-xl bg-white hover:bg-[#fef2f2] border-2 border-stone-300 hover:border-[#991b1b] transition flex items-start gap-3"
+              >
+                <span class="w-7 h-7 rounded-full bg-[#78350f] text-white font-bold text-sm flex items-center justify-center shrink-0">C</span>
+                <span class="text-sm sm:text-base font-bold text-[#1c1917]">江南世家大族的門第禮法與詩賦雅集傳統。</span>
+              </button>
+            </div>
+            <div id="v2-2a-feedback" class="hidden p-3.5 rounded-xl text-sm font-bold"></div>
+          </div>
+        </article>
+
+        <!-- 步驟 2B（第二問：四項具體德政） -->
+        <article id="v2-step-2b" class="hidden step-card rounded-2xl p-5 sm:p-6 space-y-4 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#78350f] text-white font-bold text-xs sm:text-sm">第二階・步驟 2B（第二問）</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">愛民施政：改善民生的四項具體舉措</h3>
+            </div>
+            <span id="v2-2b-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#fffbeb] text-[#78350f] border border-[#78350f]/30">進行中</span>
+          </div>
+
+          <p class="text-sm sm:text-base text-[#292524]">
+            既知「民間疾苦」，朕登基後推行哪四項具體德政來「改善民生」？請完成句中下拉選單：
+          </p>
+
+          <div class="p-4 sm:p-5 rounded-xl bg-[#fffbeb] border border-[#78350f]/30 text-base sm:text-lg leading-loose text-[#1c1917] font-medium">
+            整頓 <span class="inline-slot" data-group="v2-2b" data-ans="吏治" data-opts="吏治,科舉,禮樂,邊防"></span>、
+            嚴懲 <span class="inline-slot" data-group="v2-2b" data-ans="貪官" data-opts="貪官,儒生,商賈,僧侶"></span>、
+            整理 <span class="inline-slot" data-group="v2-2b" data-ans="戶口" data-opts="戶口,兵器,典籍,驛站"></span>、
+            減輕 <span class="inline-slot" data-group="v2-2b" data-ans="賦稅" data-opts="賦稅,刑罰,軍役,關稅"></span>
+            ➔ 達成改善 <span class="inline-slot" data-group="v2-2b" data-ans="民生" data-opts="民生,軍備,外交,文風"></span>。
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div id="v2-2b-feedback" class="text-sm font-bold text-[#292524]"></div>
+            <button
+              type="button"
+              onclick="checkStepDropdowns('v2-2b', 'v2-step-3a', 'v2-2b-badge', 'v2-2b-feedback', () => { adjustStat(2, 'peopleSupport', +25); adjustStat(2, 'authority', +10); })"
+              class="px-5 py-2.5 rounded-xl bg-[#991b1b] hover:bg-[#b91c1c] text-white font-bold text-sm shadow transition"
+            >
+              確認德政並進入第三階（君主集權核心成因）➔
+            </button>
+          </div>
+        </article>
+
+        <!-- ──────── 第三階：多問多答推論（分支二：出身低微 ➔ 猜忌多疑 ➔ 君主集權） ──────── -->
+        <!-- 步驟 3A（第一問：早年身世剖析） -->
+        <article id="v2-step-3a" class="hidden step-card rounded-2xl p-5 sm:p-6 space-y-4 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#991b1b] text-white font-bold text-xs sm:text-sm">第三階・步驟 3A（第一問）</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">身世分支二：朕心中最忌諱的早年過往</h3>
+            </div>
+            <span id="v2-3a-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#fef2f2] text-[#991b1b]">進行中</span>
+          </div>
+
+          <div class="rounded-2xl p-4 bg-[#1f0d0d] text-[#ffffff] border border-[#991b1b] text-sm sm:text-base leading-relaxed">
+            <strong class="text-[#fbbf24]">【明太祖・朱元璋】</strong>：「平民出身固然讓朕體恤百姓，但另一方面，朕早年這段坎坷卑微的經歷，卻在朕心底埋下了難以抹去的陰影……」
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-xl bg-[#fef2f2] border border-[#991b1b]/30 text-base sm:text-lg leading-loose text-[#1c1917] font-medium">
+            朕早年出身
+            <span class="inline-slot" data-group="v2-3a" data-ans="低微" data-opts="低微,顯赫,名門,宗室"></span>，學識
+            <span class="inline-slot" data-group="v2-3a" data-ans="淺薄" data-opts="淺薄,淵博,精通,卓越"></span>，曾做過
+            <span class="inline-slot" data-group="v2-3a" data-ans="反賊" data-opts="反賊,宰相,狀元,藩王"></span>、
+            <span class="inline-slot" data-group="v2-3a" data-ans="和尚" data-opts="和尚,將軍,太傅,使節"></span>，和
+            <span class="inline-slot" data-group="v2-3a" data-ans="乞丐" data-opts="乞丐,富商,學士,諸侯"></span>，常擔心朝臣在背後譏諷朕。
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div id="v2-3a-feedback" class="text-sm font-bold text-[#292524]"></div>
+            <button
+              type="button"
+              onclick="checkStepDropdowns('v2-3a', 'v2-step-3b', 'v2-3a-badge', 'v2-3a-feedback', () => { adjustStat(2, 'suspicion', +10); })"
+              class="px-5 py-2.5 rounded-xl bg-[#991b1b] hover:bg-[#b91c1c] text-white font-bold text-sm shadow transition"
+            >
+              確認身世背景並追問心理性格轉變 ➔
+            </button>
+          </div>
+        </article>
+
+        <!-- 步驟 3B（第二問：心理性格轉變） -->
+        <article id="v2-step-3b" class="hidden step-card rounded-2xl p-5 sm:p-6 space-y-4 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#991b1b] text-white font-bold text-xs sm:text-sm">第三階・步驟 3B（第二問）</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">心理轉變：自卑與防備催生何種性格？</h3>
+            </div>
+            <span id="v2-3b-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#fef2f2] text-[#991b1b]">因果推理二</span>
+          </div>
+
+          <h4 class="font-serif font-bold text-base sm:text-lg text-[#991b1b]">
+            ❓ 追問二：出身低微、學識淺薄，又時刻擔心朝臣在背後譏諷自己，這種心態使朕養成了怎樣的性格？
+          </h4>
+
+          <div class="grid grid-cols-1 gap-3">
+            <button
+              type="button"
+              onclick="handleV2Step3B('A')"
+              class="text-left p-4 rounded-xl bg-white hover:bg-[#fef2f2] border-2 border-stone-300 hover:border-[#991b1b] transition flex items-start gap-3"
+            >
+              <span class="w-7 h-7 rounded-full bg-[#991b1b] text-white font-bold text-sm flex items-center justify-center shrink-0">A</span>
+              <span class="text-sm sm:text-base font-bold text-[#1c1917]">豁達大度、廣納諫言，對飽讀詩書的文臣與開國武將完全信任。</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="handleV2Step3B('B')"
+              class="text-left p-4 rounded-xl bg-white hover:bg-[#fef2f2] border-2 border-stone-300 hover:border-[#991b1b] transition flex items-start gap-3"
+            >
+              <span class="w-7 h-7 rounded-full bg-[#991b1b] text-white font-bold text-sm flex items-center justify-center shrink-0">B</span>
+              <span class="text-sm sm:text-base font-bold text-[#1c1917]">性格「猜忌多疑」，對臣下的一言一行高度敏感戒備，唯恐遭人輕視與背叛。</span>
+            </button>
+
+            <button
+              type="button"
+              onclick="handleV2Step3B('C')"
+              class="text-left p-4 rounded-xl bg-white hover:bg-[#fef2f2] border-2 border-stone-300 hover:border-[#991b1b] transition flex items-start gap-3"
+            >
+              <span class="w-7 h-7 rounded-full bg-[#991b1b] text-white font-bold text-sm flex items-center justify-center shrink-0">C</span>
+              <span class="text-sm sm:text-base font-bold text-[#1c1917]">消極避世、厭倦政務，將朝政大權全數交由宰相統籌處理。</span>
+            </button>
+          </div>
+          <div id="v2-3b-feedback" class="hidden p-3.5 rounded-xl text-sm font-bold"></div>
+        </article>
+
+        <!-- 步驟 3C（第三問：深層恐懼與君主集權政策抉擇） -->
+        <article id="v2-step-3c" class="hidden step-card rounded-2xl p-5 sm:p-6 space-y-4 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#991b1b] text-white font-bold text-xs sm:text-sm">第三階・步驟 3C（第三問）</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">終極推論：深層恐懼與君主集權政策</h3>
+            </div>
+            <span id="v2-3c-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#fef2f2] text-[#991b1b]">進行中</span>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-xl bg-[#fef2f2] border border-[#991b1b]/30 text-base sm:text-lg leading-loose text-[#1c1917] font-medium space-y-3">
+            <p>
+              <strong class="text-[#991b1b]">① 深層恐懼：</strong>猜忌多疑讓朕日夜擔心有人從朕及子孫手中搶走
+              <span class="inline-slot" data-group="v2-3c" data-ans="政權" data-opts="政權,財富,兵符,封地"></span>。
+            </p>
+            <p>
+              <strong class="text-[#78350f]">② 政策抉擇：</strong>因此朕最終決定推行
+              <span class="inline-slot" data-group="v2-3c" data-ans="君主集權" data-opts="君主集權,地方分權,藩鎮割據,貴族共和"></span>
+              政策，消滅威脅
+              <span class="inline-slot" data-group="v2-3c" data-ans="君權" data-opts="君權,相權,兵權,民權"></span>
+              的力量，將國家大權緊緊掌控在
+              <span class="inline-slot" data-group="v2-3c" data-ans="君主" data-opts="君主,宰相,諸王,六部"></span> 手中。
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div id="v2-3c-feedback" class="text-sm font-bold text-[#292524]"></div>
+            <button
+              type="button"
+              onclick="checkStepDropdowns('v2-3c', 'v2-step-4', 'v2-3c-badge', 'v2-3c-feedback', () => { adjustStat(2, 'authority', +20); adjustStat(2, 'suspicion', +15); })"
+              class="px-5 py-2.5 rounded-xl bg-[#991b1b] hover:bg-[#b91c1c] text-white font-bold text-sm shadow transition"
+            >
+              確認集權成因並進入第四階奉天殿博弈 ➔
+            </button>
+          </div>
+        </article>
+
+        <!-- ──────── 第四階：奉天殿君臣博弈 RPG + 雙線因果鍊驗證 ──────── -->
+        <article id="v2-step-4" class="hidden step-card rounded-2xl p-5 sm:p-6 space-y-6 animate-reveal">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-3 py-1 rounded-lg bg-[#991b1b] text-white font-bold text-xs sm:text-sm">第四階・奉天殿博弈與因果鍊</span>
+              <h3 class="font-serif font-bold text-lg sm:text-xl text-[#1c1917]">胡惟庸案與廢除丞相制度情境推演</h3>
+            </div>
+            <span id="v2-4-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#fef2f2] text-[#991b1b]">進行中</span>
+          </div>
+
+          <!-- RPG 框（深紫檀暗紅黑底 #1f0d0d 配純白字 #ffffff 與亮琥珀 #fbbf24） -->
+          <div class="rounded-2xl p-5 bg-[#1f0d0d] text-[#ffffff] border-2 border-[#991b1b] space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <span class="font-serif font-bold text-base sm:text-lg text-[#fbbf24]">👑 第一人稱情境：奉天殿御批與相權危機</span>
+              <span class="px-2.5 py-0.5 rounded bg-[#991b1b] text-white text-xs font-bold">洪武十三年・朝堂風雲</span>
+            </div>
+            <p class="text-sm sm:text-base leading-relaxed text-[#f5f5f4]">
+              朕在奉天殿察覺中書省左丞相<strong>胡惟庸</strong>結黨營私、擅權專斷，甚至在各地奏章中發現文臣暗藏「光（和尚）」、「則（反賊）」等字眼影射朕的早年出身！為徹底消除威脅君權的力量，朕該如何改革中央官制？
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <button
+                type="button"
+                onclick="handleV2Rpg('A')"
+                class="p-4 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-600 text-left transition space-y-1"
+              >
+                <div class="font-bold text-[#fbbf24] text-sm">抉擇 A：擴大中書省宰相權力</div>
+                <p class="text-xs sm:text-sm text-stone-200">另立新宰相並賦予統領六部與軍隊之權，以制衡皇權。</p>
+              </button>
+
+              <button
+                type="button"
+                onclick="handleV2Rpg('B')"
+                class="p-4 rounded-xl bg-stone-900 hover:bg-stone-800 border-2 border-[#fbbf24] text-left transition space-y-1"
+              >
+                <div class="font-bold text-[#fbbf24] text-sm">抉擇 B：廢除丞相、權分六部直屬皇帝</div>
+                <p class="text-xs sm:text-sm text-stone-200">誅殺胡惟庸並永久廢除丞相制度，六部直接對皇帝負責，並設錦衣衛監察百官。</p>
+              </button>
+
+              <button
+                type="button"
+                onclick="handleV2Rpg('C')"
+                class="p-4 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-600 text-left transition space-y-1"
+              >
+                <div class="font-bold text-[#fbbf24] text-sm">抉擇 C：交由開國武將輪流執政</div>
+                <p class="text-xs sm:text-sm text-stone-200">裁撤文官中書省，改由開國功臣武將世襲執掌中央軍政。</p>
+              </button>
+            </div>
+
+            <div id="v2-rpg-success" class="hidden p-4 rounded-xl bg-red-950 border border-[#fbbf24] text-sm sm:text-base text-white leading-relaxed animate-reveal">
+              🔥 <strong>君主集權達到頂峰！</strong>明太祖廢除延續千餘年的丞相制度，使六部直接聽命於皇帝，並設錦衣衛加強監察、誅殺功臣與大興文字獄，徹底消滅了威脅君權的力量，將國家大權緊緊掌控在君主手中！
+            </div>
+          </div>
+
+          <!-- 視覺化因果鍊鎖定 -->
+          <div class="causal-box rounded-2xl p-5 bg-[#fffbeb] border border-[#78350f]/30 space-y-4">
+            <h4 class="font-serif font-bold text-base sm:text-lg text-[#991b1b]">
+              ⛓️ 視覺化因果鍊：完成明太祖君主集權成因因果配對以解鎖第五階小測
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div class="p-3.5 rounded-xl bg-white border border-stone-300">
+                <span class="text-xs font-bold text-[#991b1b] block mb-1">① 身世起點</span>
+                <select id="v2-c1" class="chain-dd w-full p-2.5 rounded-lg text-xs sm:text-sm">
+                  <option value="">-- 請選擇起點 --</option>
+                  <option value="correct">出身低微、學識淺薄</option>
+                  <option value="wrong1">出身皇室宗親、飽讀詩書</option>
+                  <option value="wrong2">世代為將、掌握邊防兵權</option>
+                </select>
+              </div>
+              <div class="p-3.5 rounded-xl bg-white border border-stone-300">
+                <span class="text-xs font-bold text-[#991b1b] block mb-1">② 性格形成</span>
+                <select id="v2-c2" class="chain-dd w-full p-2.5 rounded-lg text-xs sm:text-sm">
+                  <option value="">-- 請選擇性格 --</option>
+                  <option value="wrong1">豁達大度、完全信任功臣</option>
+                  <option value="correct">性格猜忌多疑</option>
+                  <option value="wrong2">崇尚無為而治、放權宰相</option>
+                </select>
+              </div>
+              <div class="p-3.5 rounded-xl bg-white border border-stone-300">
+                <span class="text-xs font-bold text-[#991b1b] block mb-1">③ 核心憂慮</span>
+                <select id="v2-c3" class="chain-dd w-full p-2.5 rounded-lg text-xs sm:text-sm">
+                  <option value="">-- 請選擇憂慮 --</option>
+                  <option value="wrong1">擔心國庫白銀過多無處存放</option>
+                  <option value="wrong2">擔心江南商業過度繁榮</option>
+                  <option value="correct">擔心有人搶走政權</option>
+                </select>
+              </div>
+              <div class="p-3.5 rounded-xl bg-white border border-stone-300">
+                <span class="text-xs font-bold text-[#991b1b] block mb-1">④ 最終政策</span>
+                <select id="v2-c4" class="chain-dd w-full p-2.5 rounded-lg text-xs sm:text-sm">
+                  <option value="">-- 請選擇政策 --</option>
+                  <option value="wrong1">推行地方分權與藩鎮割據</option>
+                  <option value="correct">推行君主集權政策</option>
+                  <option value="wrong2">恢復中書省宰相總領百官</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div id="v2-chain-fb" class="text-sm font-bold text-[#292524]"></div>
+              <button
+                type="button"
+                onclick="verifyV2Chain()"
+                class="px-5 py-2.5 rounded-xl bg-[#991b1b] hover:bg-[#b91c1c] text-white font-bold text-sm shadow transition"
+              >
+                鎖定因果鍊並解鎖第五階總結小測 ➔
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- ──────── 第五階：卷二課題筆記下拉式填充總結小測（19 格） ──────── -->
+        <article id="v2-step-5" class="hidden quiz-box rounded-2xl p-5 sm:p-6 border-2 border-[#991b1b] space-y-5 animate-reveal">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-4">
+            <div>
+              <span class="px-3 py-1 rounded-lg bg-[#991b1b] text-white font-bold text-xs sm:text-sm">第五階・總結驗收</span>
+              <h3 class="font-serif font-bold text-xl sm:text-2xl text-[#1c1917] mt-1.5">
+                卷二課題筆記下拉式填充小測（共 19 格）
+              </h3>
+              <p class="text-xs sm:text-sm text-[#292524]">請完成所有句中下拉選單，提交後系統將即時批改並在錯題旁以紅字顯示正確答案：</p>
+            </div>
+            <div id="v2-quiz-score" class="hidden px-4 py-2 rounded-xl bg-[#991b1b] text-white font-bold text-sm shadow">
+              得分：0 / 19
+            </div>
+          </div>
+
+          <div class="space-y-3.5 text-sm sm:text-base leading-loose text-[#1c1917]">
+            <div class="p-4 rounded-xl bg-[#fffbeb] border border-stone-300">
+              <strong class="text-[#991b1b]">1.</strong>
+              元代實行
+              <span class="quiz-slot" data-vol="2" data-ans="高壓" data-opts="高壓,懷柔,漢化,寬鬆"></span>
+              統治，激發人民
+              <span class="quiz-slot" data-vol="2" data-ans="反抗" data-opts="反抗,順從,遷徙,歸附"></span>，元末群雄起事，
+              <span class="quiz-slot" data-vol="2" data-ans="朱元璋" data-opts="朱元璋,劉伯溫,徐達,陳友諒"></span>
+              推翻元朝，改國號明，是為
+              <span class="quiz-slot" data-vol="2" data-ans="明太祖" data-opts="明太祖,明成祖,明仁宗,明英宗"></span>。
+            </div>
+
+            <div class="p-4 rounded-xl bg-[#fffbeb] border border-stone-300">
+              <strong class="text-[#991b1b]">2.</strong>
+              朱元璋：
+              <span class="quiz-slot" data-vol="2" data-ans="平民" data-opts="平民,貴族,皇室,世家"></span> 出身。
+            </div>
+
+            <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-300">
+              <strong class="text-emerald-900">3.【民生線】</strong>
+              能了解
+              <span class="quiz-slot" data-vol="2" data-ans="民間疾苦" data-opts="民間疾苦,草原習俗,塞外軍情,西域商務"></span>
+              ➔ 整頓
+              <span class="quiz-slot" data-vol="2" data-ans="吏治" data-opts="吏治,科舉,禮樂,邊防"></span>、嚴懲
+              <span class="quiz-slot" data-vol="2" data-ans="貪官" data-opts="貪官,儒生,商賈,僧侶"></span>、整理
+              <span class="quiz-slot" data-vol="2" data-ans="戶口" data-opts="戶口,兵器,典籍,驛站"></span>、減輕
+              <span class="quiz-slot" data-vol="2" data-ans="賦稅" data-opts="賦稅,刑罰,軍役,關稅"></span>
+              ➔ 能改善
+              <span class="quiz-slot" data-vol="2" data-ans="民生" data-opts="民生,軍備,外交,文風"></span>。
+            </div>
+
+            <div class="p-4 rounded-xl bg-[#fef2f2] border border-[#991b1b]/40">
+              <strong class="text-[#991b1b]">4.【君主集權線】</strong>
+              出身
+              <span class="quiz-slot" data-vol="2" data-ans="低微" data-opts="低微,顯赫,名門,宗室"></span>，學識
+              <span class="quiz-slot" data-vol="2" data-ans="淺薄" data-opts="淺薄,淵博,精通,卓越"></span>（曾做過
+              <span class="quiz-slot" data-vol="2" data-ans="反賊" data-opts="反賊,宰相,狀元,藩王"></span>、和尚、和乞丐，擔心他人譏諷）➔ 故使性格
+              <span class="quiz-slot" data-vol="2" data-ans="猜忌多疑" data-opts="猜忌多疑,寬厚仁慈,優柔寡斷,豁達大度"></span>
+              ➔ 擔心有人從他及子孫手中搶走
+              <span class="quiz-slot" data-vol="2" data-ans="政權" data-opts="政權,財富,兵符,封地"></span>
+              ➔ 推行
+              <span class="quiz-slot" data-vol="2" data-ans="君主集權" data-opts="君主集權,地方分權,藩鎮割據,貴族共和"></span>
+              政策，消滅威脅
+              <span class="quiz-slot" data-vol="2" data-ans="君權" data-opts="君權,相權,兵權,民權"></span>
+              的力量，將國家大權緊緊掌控在
+              <span class="quiz-slot" data-vol="2" data-ans="君主" data-opts="君主,宰相,諸王,六部"></span> 手中。
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <button
+              type="button"
+              onclick="gradeSummaryQuiz(2)"
+              class="px-6 py-3 rounded-xl bg-[#991b1b] hover:bg-[#b91c1c] text-white font-serif font-bold text-base shadow-md transition"
+            >
+              👑 提交卷二小測並開啟總結算
+            </button>
+            <button
+              type="button"
+              onclick="resetSummaryQuiz(2)"
+              class="px-4 py-2.5 rounded-xl bg-stone-200 hover:bg-stone-300 text-[#1c1917] font-bold text-sm transition"
+            >
+              重設卷二選項
+            </button>
+          </div>
+        </article>
+
+        <!-- 雙卷總體結算稱號面板 -->
+        <section id="final-summary-card" class="hidden rounded-2xl p-6 sm:p-7 bg-[#1f0d0d] text-white border-4 border-double border-[#fbbf24] shadow-2xl space-y-5 animate-reveal">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-700 pb-4">
+            <div class="flex items-center gap-4">
+              <div id="final-icon" class="w-16 h-16 rounded-2xl bg-[#991b1b] border-2 border-[#fbbf24] flex items-center justify-center text-3xl shrink-0">
+                🏆
+              </div>
+              <div>
+                <span class="text-xs font-bold text-[#fbbf24] tracking-wider uppercase">元明歷史推演館・結算稱號頒發</span>
+                <h3 id="final-rank-name" class="font-serif font-black text-2xl text-white mt-0.5"></h3>
+                <p id="final-rank-desc" class="text-sm text-stone-200 mt-1"></p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 bg-black/40 p-3 rounded-xl border border-stone-700 text-center shrink-0">
+              <div>
+                <div class="text-xs text-stone-300">卷一小測</div>
+                <div id="final-v1-stat" class="font-bold text-base text-sky-300">-- / 28</div>
+              </div>
+              <div>
+                <div class="text-xs text-stone-300">卷二小測</div>
+                <div id="final-v2-stat" class="font-bold text-base text-[#fbbf24]">-- / 19</div>
+              </div>
+              <div>
+                <div class="text-xs text-stone-300">綜合準確率</div>
+                <div id="final-acc-stat" class="font-bold text-base text-emerald-300">--%</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </div>
+
+    <!-- 右側常駐狀態側欄 (佔 3 欄，高對比象牙白卡片) -->
+    <aside class="lg:col-span-3 space-y-5 lg:sticky lg:top-24">
+      <!-- 即時治國指標卡片 -->
+      <div class="sidebar-card rounded-2xl p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-stone-200 pb-2.5">
+          <h3 id="sidebar-stats-title" class="font-serif font-bold text-base text-[#1e3a8a]">
+            📊 卷一・大元治國指標
+          </h3>
+          <span class="text-xs font-bold px-2 py-0.5 rounded bg-stone-200 text-[#1c1917]">即時連動</span>
+        </div>
+
+        <div id="sidebar-stats-list" class="space-y-3.5 text-sm">
+          <!-- 由 JS 動態渲染 -->
+        </div>
+      </div>
+
+      <!-- 學習指引卡片 -->
+      <div class="sidebar-card rounded-2xl p-5 space-y-3">
+        <h4 class="font-serif font-bold text-base text-[#1c1917] flex items-center gap-1.5">
+          <span>💡</span>
+          <span>漸進式推演規則</span>
+        </h4>
+        <ul class="space-y-2 text-xs sm:text-sm text-[#292524] leading-relaxed list-disc list-inside">
+          <li>每卷初始僅開放<strong>第一階・步驟 1A</strong>，避免過早劇透筆記重點。</li>
+          <li>完成當前句中下拉選答或因果推理題，即可解鎖下一步驟。</li>
+          <li>如為課堂教師演示，可點擊頂部「<strong>🔓 教師一鍵全解鎖</strong>」並輸入密碼解鎖全部內容。</li>
+        </ul>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- ==================== 密碼驗證教師解鎖彈窗 (無原生 prompt/alert) ==================== -->
+  <div id="teacher-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="max-w-md w-full rounded-2xl bg-[#fffdf9] text-[#1c1917] border-2 border-[#111827] shadow-2xl overflow-hidden animate-reveal">
+      <div class="bg-[#111827] text-white px-5 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-2 font-serif font-bold text-base sm:text-lg">
+          <span>🔓</span>
+          <span>教師模式密碼驗證</span>
+        </div>
+        <button type="button" onclick="closeTeacherModal()" class="text-slate-300 hover:text-white text-xl font-bold leading-none">&times;</button>
+      </div>
+      <div class="p-5 sm:p-6 space-y-4">
+        <p class="text-sm text-[#292524] leading-relaxed">
+          請輸入教師專用密碼，驗證通過後將立即解鎖【卷一】與【卷二】的所有階段步驟與總結小測：
+        </p>
+        <div>
+          <label for="teacher-pwd-input" class="block text-xs font-bold text-[#1c1917] mb-1.5">教師密碼</label>
+          <input
+            id="teacher-pwd-input"
+            type="password"
+            placeholder="請輸入密碼..."
+            onkeydown="if (event.key === 'Enter') verifyTeacherPassword();"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-white border-2 border-stone-400 focus:border-[#1e3a8a] focus:outline-none text-base font-bold text-[#111827]"
+          />
+          <p id="teacher-pwd-error" class="hidden mt-2 text-xs sm:text-sm font-bold text-[#991b1b]">
+            ❌ 密碼錯誤，請輸入正確的教師密碼！
+          </p>
+        </div>
+        <div class="flex justify-end gap-2.5 pt-1">
+          <button
+            type="button"
+            onclick="closeTeacherModal()"
+            class="px-4 py-2 rounded-xl bg-stone-200 hover:bg-stone-300 text-[#1c1917] font-bold text-sm transition"
+          >
+            取消
+          </button>
+          <button
+            type="button"
+            onclick="verifyTeacherPassword()"
+            class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-sm shadow transition"
+          >
+            確認解鎖
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 有意義的失敗彈窗 (替代 alert) ==================== -->
+  <div id="failure-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="max-w-lg w-full rounded-2xl bg-[#fffdf9] text-[#1c1917] border-2 border-[#991b1b] shadow-2xl overflow-hidden animate-reveal">
+      <div class="bg-[#991b1b] text-white px-5 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-2 font-serif font-bold text-base sm:text-lg">
+          <span>⚠️</span>
+          <span id="fail-modal-title">歷史推演：決策危機！</span>
+        </div>
+        <button type="button" onclick="closeFailureModal()" class="text-red-200 hover:text-white text-xl font-bold leading-none">&times;</button>
+      </div>
+      <div class="p-5 sm:p-6 space-y-4">
+        <p id="fail-modal-body" class="text-sm sm:text-base text-[#1c1917] leading-relaxed"></p>
+        <div id="fail-modal-impact" class="p-3 rounded-xl bg-[#fef2f2] border border-[#991b1b]/40 text-xs sm:text-sm font-bold text-[#991b1b]"></div>
+        <div class="flex justify-end">
+          <button
+            type="button"
+            onclick="closeFailureModal()"
+            class="px-5 py-2.5 rounded-xl bg-[#111827] hover:bg-slate-800 text-white font-bold text-sm shadow transition"
+          >
+            重新審視局勢（再試一次）
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 完整互動邏輯腳本 ==================== -->
+  <script>
+    // 卷一與卷二的所有步驟 ID 清單（嚴格按順序漸進解鎖）
+    const VOL1_STEPS = [
+      'v1-step-1a',
+      'v1-step-1b',
+      'v1-step-2a',
+      'v1-step-2b',
+      'v1-step-3a',
+      'v1-step-3b',
+      'v1-step-4',
+      'v1-step-5'
+    ];
+
+    const VOL2_STEPS = [
+      'v2-step-1a',
+      'v2-step-2a',
+      'v2-step-2b',
+      'v2-step-3a',
+      'v2-step-3b',
+      'v2-step-3c',
+      'v2-step-4',
+      'v2-step-5'
+    ];
+
+    const appState = {
+      currentVol: 1,
+      teacherUnlocked: false,
+      unlockedSteps: new Set(['v1-step-1a', 'v2-step-1a']),
+      v1Stats: { control: 50, resentment: 40, integration: 30 },
+      v2Stats: { authority: 45, peopleSupport: 45, suspicion: 60 },
+      v1RpgDone: false,
+      v2RpgDone: false,
+      quizScores: { v1: null, v2: null }
+    };
+
+    window.onload = function () {
+      buildAllDropdowns();
+      renderSidebarStats();
+      renderRoadmaps();
+    };
+
+    /**
+     * 將所有 .inline-slot 與 .quiz-slot 生成高對比下拉選單
+     */
+    function buildAllDropdowns() {
+      // 句中互動下拉選單
+      document.querySelectorAll('.inline-slot').forEach((slot, idx) => {
+        const group = slot.getAttribute('data-group');
+        const ans = slot.getAttribute('data-ans');
+        const opts = slot.getAttribute('data-opts').split(',');
+
+        const select = document.createElement('select');
+        select.className = 'inline-dd mx-1 my-0.5 px-2.5 py-1 rounded-lg text-sm sm:text-base cursor-pointer';
+        select.setAttribute('data-group', group);
+        select.setAttribute('data-ans', ans);
+        select.id = `inline-dd-${group}-${idx}`;
+
+        const defOpt = document.createElement('option');
+        defOpt.value = '';
+        defOpt.textContent = '▼ 請選擇';
+        select.appendChild(defOpt);
+
+        opts.forEach(o => {
+          const op = document.createElement('option');
+          op.value = o;
+          op.textContent = o;
+          select.appendChild(op);
+        });
+
+        slot.replaceWith(select);
+      });
+
+      // 第五階總結小測下拉選單
+      document.querySelectorAll('.quiz-slot').forEach((slot, idx) => {
+        const vol = slot.getAttribute('data-vol');
+        const ans = slot.getAttribute('data-ans');
+        const opts = slot.getAttribute('data-opts').split(',');
+
+        const wrap = document.createElement('span');
+        wrap.className = 'inline-flex flex-wrap items-center gap-1.5 mx-1 my-0.5 align-middle';
+
+        const select = document.createElement('select');
+        select.className = 'quiz-dd px-2.5 py-1 rounded-lg text-xs sm:text-sm cursor-pointer';
+        select.setAttribute('data-vol', vol);
+        select.setAttribute('data-ans', ans);
+        select.id = `quiz-dd-${vol}-${idx}`;
+
+        const defOpt = document.createElement('option');
+        defOpt.value = '';
+        defOpt.textContent = '▼ 請選擇';
+        select.appendChild(defOpt);
+
+        opts.forEach(o => {
+          const op = document.createElement('option');
+          op.value = o;
+          op.textContent = o;
+          select.appendChild(op);
+        });
+
+        const hint = document.createElement('span');
+        hint.id = `quiz-hint-${vol}-${idx}`;
+        hint.className = 'hidden px-2 py-0.5 rounded bg-[#fee2e2] border border-[#b91c1c] text-[#7f1d1d] font-bold text-xs';
+
+        wrap.appendChild(select);
+        wrap.appendChild(hint);
+        slot.replaceWith(wrap);
+      });
+    }
+
+    /**
+     * 切換卷一（元代）與卷二（明代）
+     */
+    function switchVolume(vol) {
+      appState.currentVol = vol;
+      const v1Sec = document.getElementById('volume-1-section');
+      const v2Sec = document.getElementById('volume-2-section');
+      const tab1 = document.getElementById('tab-vol1');
+      const tab2 = document.getElementById('tab-vol2');
+      const emblem = document.getElementById('header-emblem');
+
+      if (vol === 1) {
+        v1Sec.classList.remove('hidden');
+        v2Sec.classList.add('hidden');
+        tab1.className = 'flex-1 sm:flex-initial px-4 py-2 rounded-lg font-serif font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-[#1e3a8a] text-white shadow ring-2 ring-sky-300';
+        tab2.className = 'flex-1 sm:flex-initial px-4 py-2 rounded-lg font-serif font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 text-slate-200 hover:text-white hover:bg-slate-700';
+        emblem.className = 'w-10 h-10 rounded-xl bg-[#1e3a8a] border border-sky-400/50 flex items-center justify-center shadow shrink-0';
+      } else {
+        v1Sec.classList.add('hidden');
+        v2Sec.classList.remove('hidden');
+        tab2.className = 'flex-1 sm:flex-initial px-4 py-2 rounded-lg font-serif font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 bg-[#991b1b] text-white shadow ring-2 ring-amber-300';
+        tab1.className = 'flex-1 sm:flex-initial px-4 py-2 rounded-lg font-serif font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 text-slate-200 hover:text-white hover:bg-slate-700';
+        emblem.className = 'w-10 h-10 rounded-xl bg-[#991b1b] border border-amber-300/60 flex items-center justify-center shadow shrink-0';
+      }
+
+      renderSidebarStats();
+      renderRoadmaps();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /**
+     * 渲染右側邊欄的治國數值指標
+     */
+    function renderSidebarStats(animate = false) {
+      const titleEl = document.getElementById('sidebar-stats-title');
+      const listEl = document.getElementById('sidebar-stats-list');
+
+      if (appState.currentVol === 1) {
+        titleEl.textContent = '📊 卷一・大元治國指標';
+        titleEl.className = 'font-serif font-bold text-base text-[#1e3a8a]';
+        const stats = [
+          { label: '朝廷控制力', val: appState.v1Stats.control, bar: 'bg-[#1e3a8a]', text: 'text-[#1e3a8a]' },
+          { label: '漢人怨恨值', val: appState.v1Stats.resentment, bar: 'bg-[#991b1b]', text: 'text-[#991b1b]' },
+          { label: '民族融合度', val: appState.v1Stats.integration, bar: 'bg-emerald-700', text: 'text-emerald-800' }
+        ];
+        listEl.innerHTML = stats.map(s => `
+          <div class="${animate ? 'stat-pulse' : ''}">
+            <div class="flex justify-between font-bold mb-1">
+              <span class="text-[#1c1917]">${s.label}</span>
+              <span class="${s.text}">${s.val}%</span>
+            </div>
+            <div class="w-full h-2.5 bg-stone-200 rounded-full overflow-hidden">
+              <div class="h-full ${s.bar} transition-all duration-500" style="width:${s.val}%"></div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        titleEl.textContent = '📊 卷二・大明治國指標';
+        titleEl.className = 'font-serif font-bold text-base text-[#991b1b]';
+        const stats = [
+          { label: '皇權穩固度', val: appState.v2Stats.authority, bar: 'bg-[#991b1b]', text: 'text-[#991b1b]' },
+          { label: '百姓民心值', val: appState.v2Stats.peopleSupport, bar: 'bg-emerald-700', text: 'text-emerald-800' },
+          { label: '君主猜忌值', val: appState.v2Stats.suspicion, bar: 'bg-[#78350f]', text: 'text-[#78350f]' }
+        ];
+        listEl.innerHTML = stats.map(s => `
+          <div class="${animate ? 'stat-pulse' : ''}">
+            <div class="flex justify-between font-bold mb-1">
+              <span class="text-[#1c1917]">${s.label}</span>
+              <span class="${s.text}">${s.val}%</span>
+            </div>
+            <div class="w-full h-2.5 bg-stone-200 rounded-full overflow-hidden">
+              <div class="h-full ${s.bar} transition-all duration-500" style="width:${s.val}%"></div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function adjustStat(vol, key, delta) {
+      const target = vol === 1 ? appState.v1Stats : appState.v2Stats;
+      target[key] = Math.max(0, Math.min(100, target[key] + delta));
+      renderSidebarStats(true);
+    }
+
+    /**
+     * 渲染階段路線圖與當前步驟計數器
+     */
+    function renderRoadmaps() {
+      const v1UnlockedCount = VOL1_STEPS.filter(id => appState.unlockedSteps.has(id)).length;
+      document.getElementById('v1-step-counter').textContent = `第 ${v1UnlockedCount} / ${VOL1_STEPS.length} 步`;
+
+      const v1Stages = [
+        { name: '第一階：入主中原', unlocked: appState.unlockedSteps.has('v1-step-1a') },
+        { name: '第二階：危機推理', unlocked: appState.unlockedSteps.has('v1-step-2a') },
+        { name: '第三階：高壓政策', unlocked: appState.unlockedSteps.has('v1-step-3a') },
+        { name: '第四階：月餅起義', unlocked: appState.unlockedSteps.has('v1-step-4') },
+        { name: '第五階：筆記小測', unlocked: appState.unlockedSteps.has('v1-step-5') }
+      ];
+
+      document.getElementById('v1-roadmap').innerHTML = v1Stages.map(st => `
+        <div class="px-2.5 py-2 rounded-lg border text-center ${st.unlocked ? 'bg-blue-50 border-[#1e3a8a] text-[#1e3a8a]' : 'bg-stone-100 border-stone-300 text-stone-500'}">
+          ${st.unlocked ? '🔓' : '🔒'} ${st.name}
+        </div>
+      `).join('');
+
+      const v2UnlockedCount = VOL2_STEPS.filter(id => appState.unlockedSteps.has(id)).length;
+      document.getElementById('v2-step-counter').textContent = `第 ${v2UnlockedCount} / ${VOL2_STEPS.length} 步`;
+
+      const v2Stages = [
+        { name: '第一階：滅元建明', unlocked: appState.unlockedSteps.has('v2-step-1a') },
+        { name: '第二階：平民愛民', unlocked: appState.unlockedSteps.has('v2-step-2a') },
+        { name: '第三階：猜忌集權', unlocked: appState.unlockedSteps.has('v2-step-3a') },
+        { name: '第四階：廢相博弈', unlocked: appState.unlockedSteps.has('v2-step-4') },
+        { name: '第五階：筆記小測', unlocked: appState.unlockedSteps.has('v2-step-5') }
+      ];
+
+      document.getElementById('v2-roadmap').innerHTML = v2Stages.map(st => `
+        <div class="px-2.5 py-2 rounded-lg border text-center ${st.unlocked ? 'bg-[#fef2f2] border-[#991b1b] text-[#991b1b]' : 'bg-stone-100 border-stone-300 text-stone-500'}">
+          ${st.unlocked ? '🔓' : '🔒'} ${st.name}
+        </div>
+      `).join('');
+    }
+
+    /**
+     * 解鎖指定步驟卡片並平滑捲動
+     */
+    function unlockStep(stepId, shouldScroll = true) {
+      const el = document.getElementById(stepId);
+      if (!el) return;
+      const wasHidden = el.classList.contains('hidden');
+      el.classList.remove('hidden');
+      appState.unlockedSteps.add(stepId);
+      renderRoadmaps();
+      if (wasHidden && shouldScroll) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 120);
+      }
+    }
+
+    /**
+     * 通用句中下拉選答驗證函數
+     */
+    function checkStepDropdowns(group, nextStepId, badgeId, feedbackId, onSuccessCallback) {
+      const selects = document.querySelectorAll(`select.inline-dd[data-group="${group}"]`);
+      let allCorrect = true;
+
+      selects.forEach(sel => {
+        const ans = sel.getAttribute('data-ans');
+        sel.classList.remove('graded-correct', 'graded-wrong');
+        if (sel.value === ans) {
+          sel.classList.add('graded-correct');
+        } else {
+          sel.classList.add('graded-wrong');
+          allCorrect = false;
+        }
+      });
+
+      const fb = document.getElementById(feedbackId);
+      const badge = document.getElementById(badgeId);
+
+      if (allCorrect) {
+        fb.className = 'text-sm font-bold text-emerald-800';
+        fb.textContent = '✅ 回答完全正確！已為你解鎖下一步驟。';
+        badge.textContent = '✓ 已完成';
+        badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-700 text-white';
+        if (typeof onSuccessCallback === 'function') onSuccessCallback();
+        unlockStep(nextStepId, true);
+      } else {
+        fb.className = 'text-sm font-bold text-[#991b1b]';
+        fb.textContent = '❌ 紅色標示的下拉選項尚未正確，請修正後再確認！';
+      }
+    }
+
+    /* ==================== 教師密碼解鎖與重置邏輯（密碼：thh） ==================== */
+    function openTeacherModal() {
+      const modal = document.getElementById('teacher-modal');
+      const input = document.getElementById('teacher-pwd-input');
+      const err = document.getElementById('teacher-pwd-error');
+      input.value = '';
+      err.classList.add('hidden');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      setTimeout(() => input.focus(), 50);
+    }
+
+    function closeTeacherModal() {
+      const modal = document.getElementById('teacher-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function verifyTeacherPassword() {
+      const val = document.getElementById('teacher-pwd-input').value.trim();
+      const err = document.getElementById('teacher-pwd-error');
+
+      if (val === 'thh') {
+        appState.teacherUnlocked = true;
+        VOL1_STEPS.forEach(id => unlockStep(id, false));
+        VOL2_STEPS.forEach(id => unlockStep(id, false));
+
+        const statusBadge = document.getElementById('mode-status-badge');
+        statusBadge.textContent = '🔓 教師模式：已全解鎖';
+        statusBadge.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-900 text-emerald-200 border border-emerald-400';
+
+        closeTeacherModal();
+        showToast('🔓 教師密碼驗證成功！【卷一】與【卷二】所有關卡及小測已全面解鎖。');
+      } else {
+        err.classList.remove('hidden');
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast-banner');
+      toast.textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 4000);
+    }
+
+    function resetAllProgress() {
+      appState.teacherUnlocked = false;
+      appState.unlockedSteps = new Set(['v1-step-1a', 'v2-step-1a']);
+      appState.v1Stats = { control: 50, resentment: 40, integration: 30 };
+      appState.v2Stats = { authority: 45, peopleSupport: 45, suspicion: 60 };
+      appState.v1RpgDone = false;
+      appState.v2RpgDone = false;
+      appState.quizScores = { v1: null, v2: null };
+
+      // 隱藏除 1A 外的所有步驟
+      VOL1_STEPS.forEach((id, idx) => {
+        const el = document.getElementById(id);
+        if (idx === 0) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      });
+      VOL2_STEPS.forEach((id, idx) => {
+        const el = document.getElementById(id);
+        if (idx === 0) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      });
+
+      // 重置所有下拉選單與提示文字
+      document.querySelectorAll('select.inline-dd, select.chain-dd, select.quiz-dd').forEach(sel => {
+        sel.value = '';
+        sel.disabled = false;
+        sel.classList.remove('graded-correct', 'graded-wrong');
+      });
+
+      ['v1-1a-feedback', 'v1-1b-feedback', 'v1-3a-feedback', 'v1-3b-feedback', 'v1-chain-fb',
+       'v2-1a-feedback', 'v2-2b-feedback', 'v2-3a-feedback', 'v2-3c-feedback', 'v2-chain-fb'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '';
+      });
+
+      ['v1-2a-feedback', 'v1-2b-feedback', 'v2-2a-feedback', 'v2-3b-feedback',
+       'v1-rpg-success', 'v2-rpg-success', 'v1-result-banner', 'final-summary-card'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+
+      resetSummaryQuiz(1);
+      resetSummaryQuiz(2);
+
+      const statusBadge = document.getElementById('mode-status-badge');
+      statusBadge.textContent = '🔒 學生漸進模式';
+      statusBadge.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-amber-300 border border-amber-400/50';
+
+      renderSidebarStats();
+      renderRoadmaps();
+      showToast('↺ 已重置所有學習進度，兩卷恢復為學生漸進模式（僅開放步驟 1A）。');
+    }
+
+    /* ==================== 有意義的失敗彈窗 ==================== */
+    function showFailureModal(title, body, impact) {
+      document.getElementById('fail-modal-title').textContent = title;
+      document.getElementById('fail-modal-body').textContent = body;
+      document.getElementById('fail-modal-impact').textContent = impact;
+      const m = document.getElementById('failure-modal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeFailureModal() {
+      const m = document.getElementById('failure-modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    /* ==================== 卷一各步驟互動邏輯 ==================== */
+    function handleV1Step2A(choice) {
+      const fb = document.getElementById('v1-2a-feedback');
+      fb.classList.remove('hidden');
+
+      if (choice === 'A') {
+        adjustStat(1, 'control', -10);
+        showFailureModal(
+          '推論偏差：並非稅收不足！',
+          '中原與江南農耕商業發達，元朝滅南宋後獲得龐大財富與稅源，真正令少數民族統治者寢食難安的，是文化隔閡與人口懸殊引發的政治反抗！',
+          '指標變動：朝廷控制力 -10%'
+        );
+      } else if (choice === 'B') {
+        adjustStat(1, 'control', -10);
+        showFailureModal(
+          '推論偏差：塞外並非主要威脅！',
+          '蒙古帝國本就崛起於草原，北疆諸部已受節制；元朝入主中原後，真正的統治危機來自內部數量龐大的漢人百姓反抗！',
+          '指標變動：朝廷控制力 -10%'
+        );
+      } else {
+        fb.className = 'p-3.5 rounded-xl text-sm font-bold bg-emerald-100 text-emerald-900 border border-emerald-400';
+        fb.textContent = '✅ 推理精準！少數民族人數少、文化差異大、管治領土遼闊，直接導致「各地漢人反抗不斷」！現已解鎖第二問（步驟 2B）。';
+        document.getElementById('v1-2a-badge').textContent = '✓ 已識別危機';
+        document.getElementById('v1-2a-badge').className = 'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-700 text-white';
+        adjustStat(1, 'resentment', +10);
+        unlockStep('v1-step-2b', true);
+      }
+    }
+
+    function handleV1Step2B(choice) {
+      const fb = document.getElementById('v1-2b-feedback');
+      fb.classList.remove('hidden');
+
+      if (choice === 'A') {
+        adjustStat(1, 'control', -15);
+        showFailureModal(
+          '蝴蝶效應推演：政權遭架空！',
+          '蒙古貴族人數極少，若全面推行漢化並將軍政大權交由漢族士大夫主導，蒙古貴族會強烈反對，政權亦會迅速被漢族官僚架空！',
+          '指標變動：朝廷控制力 -15%'
+        );
+      } else if (choice === 'C') {
+        adjustStat(1, 'control', -20);
+        showFailureModal(
+          '蝴蝶效應推演：地方割據獨立！',
+          '在各地漢人反抗不斷的情況下放權予地方自治，無異於放棄中原統治權，各地很快便會脫離元廷獨立！',
+          '指標變動：朝廷控制力 -20%'
+        );
+      } else {
+        fb.className = 'p-3.5 rounded-xl text-sm font-bold bg-emerald-100 text-emerald-900 border border-emerald-400';
+        fb.textContent = '✅ 因果貫通！為壓制漢人反抗，元廷決定實行「高壓統治政策」！現已解鎖第三階，探究高壓政策的兩大具體支柱。';
+        document.getElementById('v1-2b-badge').textContent = '✓ 已確立方針';
+        document.getElementById('v1-2b-badge').className = 'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-700 text-white';
+        adjustStat(1, 'control', +15);
+        unlockStep('v1-step-3a', true);
+      }
+    }
+
+    function handleV1Rpg(choice) {
+      if (choice === 'A') {
+        showFailureModal(
+          '行動失敗：竹杖藏信被識破！',
+          '守城元兵正嚴格執行「禁止私藏及打造武器」禁令，見你手持竹杖便喝令停步檢查，一刀劈開竹杖搜出了密信！請改用更日常、不易起疑的節慶物品！',
+          '提示：想想八月十五中秋節家家戶戶互贈的傳統食品。'
+        );
+      } else if (choice === 'B') {
+        showFailureModal(
+          '行動失敗：觸犯夜行與集會禁令！',
+          '深夜鳴鑼聚眾直接觸犯元廷「禁止集會及夜行」禁令，巡邏騎兵聞聲包圍祠堂！請重新選擇隱蔽傳信方式！',
+          '提示：利用節日互贈食物的習俗秘密傳遞紙條。'
+        );
+      } else {
+        appState.v1RpgDone = true;
+        document.getElementById('v1-rpg-success').classList.remove('hidden');
+      }
+    }
+
+    function verifyV1Chain() {
+      const ids = ['v1-c1', 'v1-c2', 'v1-c3'];
+      let ok = true;
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('graded-correct', 'graded-wrong');
+        if (el.value === 'correct') el.classList.add('graded-correct');
+        else {
+          el.classList.add('graded-wrong');
+          ok = false;
+        }
+      });
+
+      const fb = document.getElementById('v1-chain-fb');
+      if (ok) {
+        ids.forEach(id => document.getElementById(id).disabled = true);
+        fb.className = 'text-sm font-bold text-emerald-800';
+        fb.textContent = '✅ 因果鍊鎖定成功！已解鎖第五階【卷一課題筆記下拉式填充總結小測】。';
+        document.getElementById('v1-4-badge').textContent = '✓ 已完成';
+        document.getElementById('v1-4-badge').className = 'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-700 text-white';
+        unlockStep('v1-step-5', true);
+      } else {
+        fb.className = 'text-sm font-bold text-[#991b1b]';
+        fb.textContent = '❌ 紅色標示的因果環節尚有誤，請修正後再鎖定！';
+      }
+    }
+
+    /* ==================== 卷二各步驟互動邏輯 ==================== */
+    function handleV2Step2A(choice) {
+      const dd = document.querySelector('select.inline-dd[data-group="v2-2a-dd"]');
+      const fb = document.getElementById('v2-2a-feedback');
+      fb.classList.remove('hidden');
+
+      dd.classList.remove('graded-correct', 'graded-wrong');
+      if (dd.value !== '平民') {
+        dd.classList.add('graded-wrong');
+        fb.className = 'p-3.5 rounded-xl text-sm font-bold bg-[#fee2e2] text-[#7f1d1d] border border-[#b91c1c]';
+        fb.textContent = '❌ 請先在上方句中下拉選單選出「平民」，再點選下方推理答案！';
+        return;
+      }
+      dd.classList.add('graded-correct');
+
+      if (choice === 'A') {
+        showFailureModal(
+          '心理代入偏差：不符合朱元璋出身！',
+          '朕生長於淮河流域農村，從未在塞外草原生活，這段平民經歷讓朕深刻體會的並非游牧騎射，而是底層百姓的生存苦難！',
+          '提示：回想朱元璋幼年家貧、親人餓死的經歷。'
+        );
+      } else if (choice === 'C') {
+        showFailureModal(
+          '心理代入偏差：朕並非世家貴族！',
+          '朕是平民出身，自幼家貧無力讀書，對江南世家大族的門第禮法並不熟悉，朕最了解的是民間百姓的疾苦！',
+          '提示：請從底層農民視角重新思考。'
+        );
+      } else {
+        fb.className = 'p-3.5 rounded-xl text-sm font-bold bg-emerald-100 text-emerald-900 border border-emerald-400';
+        fb.textContent = '✅ 推理正確！平民出身讓朕深刻了解「民間疾苦」！現已解鎖步驟 2B，選出朕改善民生的四項具體德政。';
+        document.getElementById('v2-2a-badge').textContent = '✓ 已完成';
+        document.getElementById('v2-2a-badge').className = 'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-700 text-white';
+        adjustStat(2, 'peopleSupport', +10);
+        unlockStep('v2-step-2b', true);
+      }
+    }
+
+    function handleV2Step3B(choice) {
+      const fb = document.getElementById('v2-3b-feedback');
+      fb.classList.remove('hidden');
+
+      if (choice === 'A') {
+        adjustStat(2, 'suspicion', +15);
+        showFailureModal(
+          '性格判斷偏差：與明太祖史實相反！',
+          '朕出身低微、學識淺薄，曾做過反賊、和尚和乞丐，心中始終防備飽讀詩書的文臣與功臣暗中譏諷或奪權，絕非豁達無防備之君！',
+          '指標變動：君主猜忌值 +15%'
+        );
+      } else if (choice === 'C') {
+        adjustStat(2, 'authority', -15);
+        showFailureModal(
+          '性格判斷偏差：明太祖極度勤政且廢相！',
+          '朕一生日理萬機、事必躬親，最忌諱大權旁落，絕不會將朝政交由宰相統籌！',
+          '指標變動：皇權穩固度 -15%'
+        );
+      } else {
+        fb.className = 'p-3.5 rounded-xl text-sm font-bold bg-emerald-100 text-emerald-900 border border-emerald-400';
+        fb.textContent = '✅ 洞察人心！自卑與擔心他人譏諷，使朕養成了「猜忌多疑」的性格！現已解鎖步驟 3C，推導最終政策抉擇。';
+        document.getElementById('v2-3b-badge').textContent = '✓ 已洞察性格';
+        document.getElementById('v2-3b-badge').className = 'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-700 text-white';
+        adjustStat(2, 'suspicion', +15);
+        unlockStep('v2-step-3c', true);
+      }
+    }
+
+    function handleV2Rpg(choice) {
+      if (choice === 'A') {
+        adjustStat(2, 'authority', -20);
+        showFailureModal(
+          '政局推演：相權過大、威脅君權！',
+          '擴大中書省宰相權力會嚴重架空皇權，正是朕最擔憂有人從朕及子孫手中搶走政權的根源！',
+          '指標變動：皇權穩固度 -20%'
+        );
+      } else if (choice === 'C') {
+        adjustStat(2, 'authority', -20);
+        showFailureModal(
+          '政局推演：武將專權危機！',
+          '讓開國武將世襲執掌軍政極易引發兵變奪權，與朕推行君主集權、消滅威脅君權力量的目標背道而馳！',
+          '指標變動：皇權穩固度 -20%'
+        );
+      } else {
+        appState.v2RpgDone = true;
+        document.getElementById('v2-rpg-success').classList.remove('hidden');
+        adjustStat(2, 'authority', +15);
+      }
+    }
+
+    function verifyV2Chain() {
+      const ids = ['v2-c1', 'v2-c2', 'v2-c3', 'v2-c4'];
+      let ok = true;
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('graded-correct', 'graded-wrong');
+        if (el.value === 'correct') el.classList.add('graded-correct');
+        else {
+          el.classList.add('graded-wrong');
+          ok = false;
+        }
+      });
+
+      const fb = document.getElementById('v2-chain-fb');
+      if (ok) {
+        ids.forEach(id => document.getElementById(id).disabled = true);
+        fb.className = 'text-sm font-bold text-emerald-800';
+        fb.textContent = '✅ 因果鍊鎖定成功！已解鎖第五階【卷二課題筆記下拉式填充總結小測】。';
+        document.getElementById('v2-4-badge').textContent = '✓ 已完成';
+        document.getElementById('v2-4-badge').className = 'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-700 text-white';
+        unlockStep('v2-step-5', true);
+      } else {
+        fb.className = 'text-sm font-bold text-[#991b1b]';
+        fb.textContent = '❌ 紅色標示的因果環節尚有誤，請修正後再鎖定！';
+      }
+    }
+
+    /* ==================== 第五階總結小測批改與稱號結算 ==================== */
+    function gradeSummaryQuiz(vol) {
+      const selects = document.querySelectorAll(`select.quiz-dd[data-vol="${vol}"]`);
+      let correct = 0;
+      const total = selects.length;
+
+      selects.forEach(sel => {
+        const ans = sel.getAttribute('data-ans');
+        const hintId = sel.id.replace('quiz-dd-', 'quiz-hint-');
+        const hintEl = document.getElementById(hintId);
+
+        sel.classList.remove('graded-correct', 'graded-wrong');
+        if (sel.value === ans) {
+          correct++;
+          sel.classList.add('graded-correct');
+          hintEl.classList.add('hidden');
+          hintEl.textContent = '';
+        } else {
+          sel.classList.add('graded-wrong');
+          hintEl.classList.remove('hidden');
+          hintEl.textContent = `✗ 正確答案：${ans}`;
+        }
+      });
+
+      const pct = Math.round((correct / total) * 100);
+
+      if (vol === 1) {
+        appState.quizScores.v1 = { correct, total };
+        const scoreEl = document.getElementById('v1-quiz-score');
+        scoreEl.classList.remove('hidden');
+        scoreEl.textContent = `得分：${correct} / ${total} (${pct}%)`;
+
+        const banner = document.getElementById('v1-result-banner');
+        banner.classList.remove('hidden');
+        document.getElementById('v1-rank-title').textContent =
+          pct === 100 ? '🏅 滿分通關：【洞察元史・大都博學士】'
+          : pct >= 75 ? '🎖️ 表現優異：【明辨史實・青史良才】'
+          : '📜 繼續努力：【初探元史・勤學書生】';
+        document.getElementById('v1-rank-desc').textContent =
+          pct === 100 ? '你已全面掌握元代高壓政策的成因、四等人制與禁令細節！'
+          : '請對照上方紅字提示溫習錯題，隨時可修正選項重新提交，或前往卷二挑戰！';
+        banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        appState.quizScores.v2 = { correct, total };
+        const scoreEl = document.getElementById('v2-quiz-score');
+        scoreEl.classList.remove('hidden');
+        scoreEl.textContent = `得分：${correct} / ${total} (${pct}%)`;
+
+        renderFinalSummary();
+      }
+    }
+
+    function resetSummaryQuiz(vol) {
+      document.querySelectorAll(`select.quiz-dd[data-vol="${vol}"]`).forEach(sel => {
+        sel.value = '';
+        sel.classList.remove('graded-correct', 'graded-wrong');
+        const hintId = sel.id.replace('quiz-dd-', 'quiz-hint-');
+        const hintEl = document.getElementById(hintId);
+        if (hintEl) {
+          hintEl.classList.add('hidden');
+          hintEl.textContent = '';
+        }
+      });
+
+      if (vol === 1) {
+        document.getElementById('v1-quiz-score').classList.add('hidden');
+        document.getElementById('v1-result-banner').classList.add('hidden');
+      } else {
+        document.getElementById('v2-quiz-score').classList.add('hidden');
+        document.getElementById('final-summary-card').classList.add('hidden');
+      }
+    }
+
+    function renderFinalSummary() {
+      const card = document.getElementById('final-summary-card');
+      card.classList.remove('hidden');
+
+      const v1 = appState.quizScores.v1 || { correct: 0, total: 28 };
+      const v2 = appState.quizScores.v2 || { correct: 0, total: 19 };
+      const sumCorrect = v1.correct + v2.correct;
+      const sumTotal = v1.total + v2.total;
+      const acc = Math.round((sumCorrect / sumTotal) * 100);
+
+      document.getElementById('final-v1-stat').textContent = appState.quizScores.v1 ? `${v1.correct} / ${v1.total}` : '尚未提交';
+      document.getElementById('final-v2-stat').textContent = `${v2.correct} / ${v2.total}`;
+      document.getElementById('final-acc-stat').textContent = `${acc}%`;
+
+      let icon = '🏆';
+      let name = '通古明今・史學大宗師';
+      let desc = '你兼通元代高壓政策與明太祖君主集權的深層因果，展現出卓越的歷史思辨能力！';
+
+      if (!appState.quizScores.v1) {
+        icon = '👑';
+        name = '明史通達・奉天殿智囊';
+        desc = '你已完成【卷二】明太祖中央集權政策推演！亦可切換回【卷一】完成元代小測，衝擊雙卷滿分！';
+      } else if (acc < 70) {
+        icon = '📜';
+        name = '博古求真・青史學士';
+        desc = '你已完成兩卷推演！建議對照紅字提示溫習錯題並重新提交，衝擊更高歷史稱號！';
+      }
+
+      document.getElementById('final-icon').textContent = icon;
+      document.getElementById('final-rank-name').textContent = name;
+      document.getElementById('final-rank-desc').textContent = desc;
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  </script>
+</body>
+</html>
